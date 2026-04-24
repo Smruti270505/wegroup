@@ -11,20 +11,23 @@ if (loginForm) {
         let email = document.getElementById("loginEmail").value;
         let password = document.getElementById("loginPassword").value;
 
-        if (email === "" || password === "") {
-            document.getElementById("loginError").innerText = "All fields are required!";
+        let storedUser = JSON.parse(localStorage.getItem("user"));
+
+        if (!storedUser) {
+            document.getElementById("loginError").innerText = "No account found. Please sign up!";
             return;
         }
 
-        if (password.length < 6) {
-            document.getElementById("loginError").innerText = "Password must be at least 6 characters";
-            return;
-        }
+        if (email === storedUser.email && password === storedUser.password) {
+            alert("Login Successful 🚀");
 
-        alert("Login Successful 🚀");
+            // later we will go to dashboard
+        } else {
+            document.getElementById("loginError").innerText = "Invalid email or password!";
+        }
     });
 }
-d// SIGNUP
+// SIGNUP
 let signupForm = document.getElementById("signupForm");
 
 if (signupForm) {
@@ -44,6 +47,15 @@ if (signupForm) {
             document.getElementById("signupError").innerText = "Password must be at least 6 characters";
             return;
         }
+
+        // 🔥 SAVE DATA
+        let user = {
+            name: name,
+            email: email,
+            password: password
+        };
+
+        localStorage.setItem("user", JSON.stringify(user));
 
         alert("Account Created Successfully 🎉");
 
