@@ -20,6 +20,7 @@ if (loginForm) {
 
         if (email === storedUser.email && password === storedUser.password) {
             alert("Login Successful 🚀");
+            window.location.href = "dashboard.html";
 
             // later we will go to dashboard
         } else {
@@ -61,4 +62,20 @@ if (signupForm) {
 
         window.location.href = "login.html";
     });
+}
+// SHOW USER ON DASHBOARD
+if (window.location.pathname.includes("dashboard.html")) {
+    let user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+        // no login → redirect
+        window.location.href = "login.html";
+    } else {
+        document.getElementById("username").innerText = user.name;
+    }
+}
+function logout() {
+    localStorage.removeItem("user");
+    alert("Logged out successfully");
+    window.location.href = "login.html";
 }
