@@ -7,11 +7,23 @@
 <body>
 
     <div class="container">
+
         <h1>Welcome, <span id="username"></span> 👋</h1>
 
-        <p>This is your WeGroup dashboard</p>
-
         <button onclick="logout()">Logout</button>
+
+        <hr>
+
+        <h2>Create Post</h2>
+
+        <textarea id="postInput" placeholder="What's on your mind?"></textarea>
+
+        <button onclick="createPost()">Post</button>
+
+        <hr>
+
+        <div id="postsContainer"></div>
+
     </div>
 
     <script src="script.js"></script>
