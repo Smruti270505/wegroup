@@ -1,32 +1,140 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
     <title>WeGroup - Dashboard</title>
+
     <link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
-    <div class="container">
+    <!-- ================= NAVBAR ================= -->
 
-        <h1>Welcome, <span id="username"></span> 👋</h1>
+    <nav class="navbar">
 
-        <button onclick="logout()">Logout</button>
+        <h2>WeGroup</h2>
 
-        <hr>
+        <div class="nav-right">
 
-        <h2>Create Post</h2>
+            <!-- SEARCH BAR -->
 
-        <textarea id="postInput" placeholder="What's on your mind?"></textarea>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search posts..."
+                onkeyup="searchPosts()"
+            >
 
-        <button onclick="createPost()">Post</button>
+            <!-- NAV LINKS -->
 
-        <hr>
+            <a href="dashboard.html">Home</a>
 
-        <div id="postsContainer"></div>
+            <a href="profile.html">Profile</a>
+
+            <!-- DARK MODE BUTTON -->
+
+            <button onclick="toggleDarkMode()">
+                🌙
+            </button>
+
+            <!-- LOGOUT BUTTON -->
+
+            <button onclick="logout()">
+                Logout
+            </button>
+
+        </div>
+
+    </nav>
+
+    <!-- ================= MAIN LAYOUT ================= -->
+
+    <div class="main-layout">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <div class="sidebar">
+
+            <h3>User Info</h3>
+
+            <p>
+                <strong>Name:</strong>
+                <span id="username"></span>
+            </p>
+
+            <hr>
+
+            <!-- USER STATS -->
+
+            <h3>Stats</h3>
+
+            <p>
+                Total Posts:
+                <span id="totalPosts">0</span>
+            </p>
+
+            <hr>
+
+            <!-- TRENDING SECTION -->
+
+            <h3>Trending</h3>
+
+            <ul>
+                <li>#Coding</li>
+                <li>#WeGroup</li>
+                <li>#Students</li>
+                <li>#Frontend</li>
+            </ul>
+
+        </div>
+
+        <!-- ================= FEED ================= -->
+
+        <div class="feed">
+
+            <h1>
+                Welcome,
+                <span id="username"></span> 👋
+            </h1>
+
+            <h2>Create Post</h2>
+
+            <!-- POST INPUT -->
+
+            <textarea
+                id="postInput"
+                maxlength="200"
+                placeholder="What's on your mind?"
+                oninput="updateCounter()"
+            ></textarea>
+
+            <!-- CHARACTER COUNTER -->
+
+            <p id="charCount">0 / 200</p>
+
+            <!-- POST BUTTON -->
+
+            <button onclick="createPost()">
+                Post
+            </button>
+
+            <hr>
+
+            <!-- POSTS CONTAINER -->
+
+            <div id="postsContainer"></div>
+
+        </div>
 
     </div>
+
+    <!-- ================= SCRIPT ================= -->
 
     <script src="script.js"></script>
 
 </body>
+
 </html>

@@ -18,8 +18,10 @@ if (loginForm) {
         let storedUser = JSON.parse(localStorage.getItem("user"));
 
         if (!storedUser) {
+
             document.getElementById("loginError").innerText =
                 "No account found. Please sign up!";
+
             return;
         }
 
@@ -96,7 +98,33 @@ if (window.location.pathname.includes("dashboard.html")) {
 
     } else {
 
-        document.getElementById("username").innerText = user.name;
+        let usernameElements =
+            document.querySelectorAll("#username");
+
+        usernameElements.forEach(function(element) {
+
+            element.innerText = user.name;
+        });
+    }
+}
+
+// ================= PROFILE PAGE =================
+
+if (window.location.pathname.includes("profile.html")) {
+
+    let user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+
+        window.location.href = "login.html";
+
+    } else {
+
+        document.getElementById("profileName").innerText =
+            user.name;
+
+        document.getElementById("profileEmail").innerText =
+            user.email;
     }
 }
 
@@ -115,9 +143,11 @@ function logout() {
 
 function createPost() {
 
-    let postInput = document.getElementById("postInput");
+    let postInput =
+        document.getElementById("postInput");
 
-    let postText = postInput.value;
+    let postText =
+        postInput.value;
 
     if (postText.trim() === "") {
 
@@ -126,10 +156,11 @@ function createPost() {
         return;
     }
 
-    let user = JSON.parse(localStorage.getItem("user"));
+    let user =
+        JSON.parse(localStorage.getItem("user"));
 
-    // OLD POSTS
-    let posts = JSON.parse(localStorage.getItem("posts")) || [];
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
 
     let newPost = {
 
@@ -144,30 +175,53 @@ function createPost() {
         time: new Date().toLocaleString()
     };
 
-    // NEWEST POST FIRST
+    // ADD NEWEST POST FIRST
     posts.unshift(newPost);
 
     // SAVE POSTS
-    localStorage.setItem("posts", JSON.stringify(posts));
+    localStorage.setItem(
+        "posts",
+        JSON.stringify(posts)
+    );
 
     // CLEAR INPUT
     postInput.value = "";
 
+    // RESET CHARACTER COUNTER
+    updateCounter();
+
     // REFRESH POSTS
     displayPosts();
+
+    // UPDATE STATS
+    updateStats();
 }
 
 // ================= DISPLAY POSTS =================
 
 function displayPosts() {
 
-    let postsContainer = document.getElementById("postsContainer");
+    let postsContainer =
+        document.getElementById("postsContainer");
 
     if (!postsContainer) return;
 
-    let posts = JSON.parse(localStorage.getItem("posts")) || [];
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
 
     postsContainer.innerHTML = "";
+
+    // EMPTY FEED MESSAGE
+    if (posts.length === 0) {
+
+        postsContainer.innerHTML = `
+            <p class="empty-message">
+                No posts yet. Start posting 🚀
+            </p>
+        `;
+
+        return;
+    }
 
     posts.forEach(function(post) {
 
@@ -200,18 +254,23 @@ function displayPosts() {
 
 function likePost(id) {
 
-    let posts = JSON.parse(localStorage.getItem("posts")) || [];
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
 
     posts = posts.map(function(post) {
 
         if (post.id === id) {
+
             post.likes++;
         }
 
         return post;
     });
 
-    localStorage.setItem("posts", JSON.stringify(posts));
+    localStorage.setItem(
+        "posts",
+        JSON.stringify(posts)
+    );
 
     displayPosts();
 }
@@ -220,18 +279,93 @@ function likePost(id) {
 
 function deletePost(id) {
 
-    let posts = JSON.parse(localStorage.getItem("posts")) || [];
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
 
     posts = posts.filter(function(post) {
 
         return post.id !== id;
     });
 
-    localStorage.setItem("posts", JSON.stringify(posts));
+    localStorage.setItem(
+        "posts",
+        JSON.stringify(posts)
+    );
 
     displayPosts();
+
+    updateStats();
 }
 
-// ================= LOAD POSTS =================
+// ================= CHARACTER COUNTER =================
+
+function updateCounter() {
+
+    let postInput =
+        document.getElementById("postInput");
+
+    if (!postInput) return;
+
+    let text =
+        postInput.value;
+
+    document.getElementById("charCount").innerText =
+        text.length + " / 200";
+}
+
+// ================= SEARCH POSTS =================
+
+function searchPosts() {
+
+    let searchText =
+        document.getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    let posts =
+        document.querySelectorAll(".post");
+
+    posts.forEach(function(post) {
+
+        let text =
+            post.innerText.toLowerCase();
+
+        if (text.includes(searchText)) {
+
+            post.style.display = "block";
+
+        } else {
+
+            post.style.display = "none";
+        }
+    });
+}
+
+// ================= DARK MODE =================
+
+function toggleDarkMode() {
+
+    document.body.classList.toggle("dark-mode");
+}
+
+// ================= UPDATE STATS =================
+
+function updateStats() {
+
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
+
+    let totalPosts =
+        document.getElementById("totalPosts");
+
+    if (totalPosts) {
+
+        totalPosts.innerText = posts.length;
+    }
+}
+
+// ================= INITIAL LOAD =================
 
 displayPosts();
+
+updateStats();
