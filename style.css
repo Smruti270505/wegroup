@@ -345,3 +345,27 @@ textarea {
         flex-wrap: wrap;
     }
 }
+/* COMMENTS */
+
+.comments {
+
+    margin-top: 15px;
+}
+
+.comments p {
+
+    background-color: #f0f2f5;
+
+    padding: 8px;
+
+    border-radius: 5px;
+
+    margin-top: 5px;
+}
+
+/* COMMENT INPUT */
+
+.post input {
+
+    margin-top: 10px;
+}

@@ -13,9 +13,11 @@ if (loginForm) {
         e.preventDefault();
 
         let email = document.getElementById("loginEmail").value;
+
         let password = document.getElementById("loginPassword").value;
 
-        let storedUser = JSON.parse(localStorage.getItem("user"));
+        let storedUser =
+            JSON.parse(localStorage.getItem("user"));
 
         if (!storedUser) {
 
@@ -53,7 +55,9 @@ if (signupForm) {
         e.preventDefault();
 
         let name = document.getElementById("name").value;
+
         let email = document.getElementById("email").value;
+
         let password = document.getElementById("password").value;
 
         if (name === "" || email === "" || password === "") {
@@ -78,7 +82,10 @@ if (signupForm) {
             password: password
         };
 
-        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
 
         alert("Account Created Successfully 🎉");
 
@@ -90,7 +97,8 @@ if (signupForm) {
 
 if (window.location.pathname.includes("dashboard.html")) {
 
-    let user = JSON.parse(localStorage.getItem("user"));
+    let user =
+        JSON.parse(localStorage.getItem("user"));
 
     if (!user) {
 
@@ -112,7 +120,8 @@ if (window.location.pathname.includes("dashboard.html")) {
 
 if (window.location.pathname.includes("profile.html")) {
 
-    let user = JSON.parse(localStorage.getItem("user"));
+    let user =
+        JSON.parse(localStorage.getItem("user"));
 
     if (!user) {
 
@@ -147,9 +156,9 @@ function createPost() {
         document.getElementById("postInput");
 
     let postText =
-        postInput.value;
+    postInput.value.trim();
 
-    if (postText.trim() === "") {
+    if (postText === "") {
 
         alert("Post cannot be empty!");
 
@@ -172,28 +181,54 @@ function createPost() {
 
         likes: 0,
 
+        comments: [],
+
         time: new Date().toLocaleString()
     };
 
     // ADD NEWEST POST FIRST
+
     posts.unshift(newPost);
 
     // SAVE POSTS
+
     localStorage.setItem(
         "posts",
         JSON.stringify(posts)
     );
 
     // CLEAR INPUT
+
     postInput.value = "";
 
+    // RESET IMAGE PREVIEW
+
+    let preview =
+        document.getElementById("preview");
+
+    let imageInput =
+        document.getElementById("imageInput");
+
+    if (preview) {
+
+        preview.style.display = "none";
+    }
+
+    if (imageInput) {
+
+        imageInput.value = "";
+    }
+
     // RESET CHARACTER COUNTER
+
     updateCounter();
 
     // REFRESH POSTS
+
     displayPosts();
 
     // UPDATE STATS
+
     updateStats();
 }
 
@@ -211,7 +246,8 @@ function displayPosts() {
 
     postsContainer.innerHTML = "";
 
-    // EMPTY FEED MESSAGE
+    // EMPTY FEED
+
     if (posts.length === 0) {
 
         postsContainer.innerHTML = `
@@ -222,6 +258,8 @@ function displayPosts() {
 
         return;
     }
+
+    // DISPLAY POSTS
 
     posts.forEach(function(post) {
 
@@ -235,6 +273,31 @@ function displayPosts() {
 
                 <small>${post.time}</small>
 
+                <div class="comments">
+
+                    ${
+                        (post.comments || [])
+                        .map(function(comment) {
+
+                            return `
+                                <p>💬 ${comment}</p>
+                            `;
+                        })
+                        .join("")
+                    }
+
+                </div>
+
+                <input
+                    type="text"
+                    id="comment-${post.id}"
+                    placeholder="Write a comment..."
+                >
+
+                <button onclick="addComment(${post.id})">
+                    Comment
+                </button>
+
                 <br><br>
 
                 <button onclick="likePost(${post.id})">
@@ -243,6 +306,10 @@ function displayPosts() {
 
                 <button onclick="deletePost(${post.id})">
                     Delete
+                </button>
+
+                <button onclick="editPost(${post.id})">
+                    Edit
                 </button>
 
             </div>
@@ -295,6 +362,111 @@ function deletePost(id) {
     displayPosts();
 
     updateStats();
+}
+
+// ================= EDIT POST =================
+
+function editPost(id) {
+
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
+
+    let post =
+        posts.find(function(p) {
+
+            return p.id === id;
+        });
+
+    let updatedText =
+        prompt("Edit your post:", post.text);
+
+    if (
+        updatedText === null ||
+        updatedText.trim() === ""
+    ) {
+
+        return;
+    }
+
+    posts = posts.map(function(p) {
+
+        if (p.id === id) {
+
+            p.text = updatedText;
+        }
+
+        return p;
+    });
+
+    localStorage.setItem(
+        "posts",
+        JSON.stringify(posts)
+    );
+
+    displayPosts();
+}
+
+// ================= ADD COMMENT =================
+
+function addComment(id) {
+
+    let commentInput =
+        document.getElementById(`comment-${id}`);
+
+    let commentText =
+        commentInput.value;
+
+    if (commentText.trim() === "") {
+
+        return;
+    }
+
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
+
+    posts = posts.map(function(post) {
+
+        if (post.id === id) {
+
+            // SAFETY CHECK
+
+            post.comments =
+                post.comments || [];
+
+            post.comments.push(commentText);
+        }
+
+        return post;
+    });
+
+    localStorage.setItem(
+        "posts",
+        JSON.stringify(posts)
+    );
+
+    displayPosts();
+}
+
+// ================= IMAGE PREVIEW =================
+
+function previewImage() {
+
+    let imageInput =
+        document.getElementById("imageInput");
+
+    let preview =
+        document.getElementById("preview");
+
+    let file =
+        imageInput.files[0];
+
+    if (file) {
+
+        preview.src =
+            URL.createObjectURL(file);
+
+        preview.style.display = "block";
+    }
 }
 
 // ================= CHARACTER COUNTER =================
