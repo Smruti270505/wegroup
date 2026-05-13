@@ -162,7 +162,7 @@ textarea {
     align-items: center;
 }
 
-/* NAVBAR RIGHT */
+/* ================= NAVBAR RIGHT ================= */
 
 .nav-right {
 
@@ -173,7 +173,7 @@ textarea {
     gap: 10px;
 }
 
-/* NAVBAR LINKS */
+/* ================= NAVBAR LINKS ================= */
 
 .navbar a {
 
@@ -184,16 +184,22 @@ textarea {
     font-weight: bold;
 }
 
-/* NAVBAR BUTTONS */
+/* ================= NAVBAR BUTTONS ================= */
 
 .navbar button {
 
     width: auto;
 
     padding: 8px 15px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    cursor: pointer;
 }
 
-/* SEARCH BAR */
+/* ================= SEARCH BAR ================= */
 
 #searchInput {
 
@@ -206,6 +212,39 @@ textarea {
     outline: none;
 }
 
+/* ================= NOTIFICATIONS PANEL ================= */
+
+.notifications {
+
+    position: absolute;
+
+    top: 70px;
+
+    right: 20px;
+
+    width: 250px;
+
+    background: white;
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+
+    display: none;
+
+    color: black;
+
+    z-index: 1000;
+}
+
+/* SHOW NOTIFICATIONS */
+
+.show-notifications {
+
+    display: block;
+}
 /* ================= MAIN LAYOUT ================= */
 
 .main-layout {
@@ -368,4 +407,52 @@ textarea {
 .post input {
 
     margin-top: 10px;
+}
+/* POST HEADER */
+
+.post-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+/* AVATAR */
+
+.avatar {
+
+    width: 45px;
+
+    height: 45px;
+
+    border-radius: 50%;
+}
+/* NOTIFICATIONS */
+
+.notifications {
+
+    position: absolute;
+
+    top: 70px;
+
+    right: 20px;
+
+    width: 250px;
+
+    background: white;
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+
+    display: none;
+}
+
+.show-notifications {
+
+    display: block;
 }

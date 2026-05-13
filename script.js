@@ -16,8 +16,17 @@ if (loginForm) {
 
         let password = document.getElementById("loginPassword").value;
 
-        let storedUser =
-            JSON.parse(localStorage.getItem("user"));
+        let users =
+    JSON.parse(localStorage.getItem("users")) || [];
+
+let storedUser =
+    users.find(function(user) {
+
+        return (
+            user.email === email &&
+            user.password === password
+        );
+    });
 
         if (!storedUser) {
 
@@ -27,12 +36,13 @@ if (loginForm) {
             return;
         }
 
-        if (
-            email === storedUser.email &&
-            password === storedUser.password
-        ) {
+        if (storedUser) {
 
             alert("Login Successful 🚀");
+            localStorage.setItem(
+    "currentUser",
+    JSON.stringify(storedUser)
+);
 
             window.location.href = "dashboard.html";
 
@@ -82,10 +92,37 @@ if (signupForm) {
             password: password
         };
 
-        localStorage.setItem(
-            "user",
-            JSON.stringify(user)
-        );
+        // GET OLD USERS
+
+let users =
+    JSON.parse(localStorage.getItem("users")) || [];
+
+// CHECK IF EMAIL EXISTS
+
+let existingUser =
+    users.find(function(u) {
+
+        return u.email === email;
+    });
+
+if (existingUser) {
+
+    document.getElementById("signupError").innerText =
+        "Email already exists!";
+
+    return;
+}
+
+// ADD NEW USER
+
+users.push(user);
+
+// SAVE USERS
+
+localStorage.setItem(
+    "users",
+    JSON.stringify(users)
+);
 
         alert("Account Created Successfully 🎉");
 
@@ -98,7 +135,7 @@ if (signupForm) {
 if (window.location.pathname.includes("dashboard.html")) {
 
     let user =
-        JSON.parse(localStorage.getItem("user"));
+        JSON.parse(localStorage.getItem("currentUser"));
 
     if (!user) {
 
@@ -121,7 +158,7 @@ if (window.location.pathname.includes("dashboard.html")) {
 if (window.location.pathname.includes("profile.html")) {
 
     let user =
-        JSON.parse(localStorage.getItem("user"));
+        JSON.parse(localStorage.getItem("currentUser"));
 
     if (!user) {
 
@@ -151,6 +188,7 @@ function logout() {
 // ================= CREATE POST =================
 
 function createPost() {
+    alert("Button clicked");
 
     let postInput =
         document.getElementById("postInput");
@@ -166,7 +204,7 @@ function createPost() {
     }
 
     let user =
-        JSON.parse(localStorage.getItem("user"));
+        JSON.parse(localStorage.getItem("currentUser"));
 
     let posts =
         JSON.parse(localStorage.getItem("posts")) || [];
@@ -176,6 +214,8 @@ function createPost() {
         id: Date.now(),
 
         username: user.name,
+        avatar:
+`https://ui-avatars.com/api/?name=${user.name}`,
 
         text: postText,
 
@@ -267,7 +307,16 @@ function displayPosts() {
 
             <div class="post">
 
-                <h3>${post.username}</h3>
+                <div class="post-header">
+
+    <img
+        src="${post.avatar}"
+        class="avatar"
+    >
+
+    <h3>${post.username}</h3>
+
+</div>
 
                 <p>${post.text}</p>
 
@@ -541,3 +590,10 @@ function updateStats() {
 displayPosts();
 
 updateStats();
+function showNotifications() {
+
+    let panel =
+        document.getElementById("notificationPanel");
+
+    panel.classList.toggle("show-notifications");
+}
