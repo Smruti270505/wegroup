@@ -34,6 +34,12 @@
 
             <a href="profile.html">Profile</a>
 
+            <!-- NOTIFICATION BUTTON -->
+
+            <button onclick="showNotifications()">
+                🔔
+            </button>
+
             <!-- DARK MODE BUTTON -->
 
             <button onclick="toggleDarkMode()">
@@ -49,6 +55,17 @@
         </div>
 
     </nav>
+
+    <!-- ================= NOTIFICATIONS PANEL ================= -->
+
+    <div
+        id="notificationPanel"
+        class="notifications"
+    >
+
+        <h3>Notifications</h3>
+
+    </div>
 
     <!-- ================= MAIN LAYOUT ================= -->
 
@@ -78,7 +95,7 @@
 
             <hr>
 
-            <!-- TRENDING SECTION -->
+            <!-- TRENDING -->
 
             <h3>Trending</h3>
 
@@ -110,29 +127,36 @@
                 placeholder="What's on your mind?"
                 oninput="updateCounter()"
             ></textarea>
+
+            <!-- IMAGE INPUT -->
+
             <input
-    type="file"
-    id="imageInput"
-    accept="image/*"
-    onchange="previewImage()"
->
+                type="file"
+                id="imageInput"
+                accept="image/*"
+                onchange="previewImage()"
+            >
 
-<br><br>
+            <br><br>
 
-<img
-    id="preview"
-    style="
-        width: 100%;
-        max-height: 300px;
-        object-fit: cover;
-        border-radius: 10px;
-        display: none;
-    "
->
+            <!-- IMAGE PREVIEW -->
+
+            <img
+                id="preview"
+                style="
+                    width: 100%;
+                    max-height: 300px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                    display: none;
+                "
+            >
 
             <!-- CHARACTER COUNTER -->
 
-            <p id="charCount">0 / 200</p>
+            <p id="charCount">
+                0 / 200
+            </p>
 
             <!-- POST BUTTON -->
 

@@ -12,45 +12,40 @@ if (loginForm) {
 
         e.preventDefault();
 
-        let email = document.getElementById("loginEmail").value;
+        let email =
+            document.getElementById("loginEmail").value;
 
-        let password = document.getElementById("loginPassword").value;
+        let password =
+            document.getElementById("loginPassword").value;
 
         let users =
-    JSON.parse(localStorage.getItem("users")) || [];
+            JSON.parse(localStorage.getItem("users")) || [];
 
-let storedUser =
-    users.find(function(user) {
+        let storedUser =
+            users.find(function(user) {
 
-        return (
-            user.email === email &&
-            user.password === password
-        );
-    });
+                return (
+                    user.email === email &&
+                    user.password === password
+                );
+            });
 
         if (!storedUser) {
 
             document.getElementById("loginError").innerText =
-                "No account found. Please sign up!";
+                "Invalid email or password!";
 
             return;
         }
 
-        if (storedUser) {
+        localStorage.setItem(
+            "currentUser",
+            JSON.stringify(storedUser)
+        );
 
-            alert("Login Successful 🚀");
-            localStorage.setItem(
-    "currentUser",
-    JSON.stringify(storedUser)
-);
+        alert("Login Successful 🚀");
 
-            window.location.href = "dashboard.html";
-
-        } else {
-
-            document.getElementById("loginError").innerText =
-                "Invalid email or password!";
-        }
+        window.location.href = "dashboard.html";
     });
 }
 
@@ -64,13 +59,20 @@ if (signupForm) {
 
         e.preventDefault();
 
-        let name = document.getElementById("name").value;
+        let name =
+            document.getElementById("name").value;
 
-        let email = document.getElementById("email").value;
+        let email =
+            document.getElementById("email").value;
 
-        let password = document.getElementById("password").value;
+        let password =
+            document.getElementById("password").value;
 
-        if (name === "" || email === "" || password === "") {
+        if (
+            name === "" ||
+            email === "" ||
+            password === ""
+        ) {
 
             document.getElementById("signupError").innerText =
                 "All fields are required!";
@@ -86,43 +88,44 @@ if (signupForm) {
             return;
         }
 
+        let users =
+            JSON.parse(localStorage.getItem("users")) || [];
+
+        let existingUser =
+            users.find(function(user) {
+
+                return user.email === email;
+            });
+
+        if (existingUser) {
+
+            document.getElementById("signupError").innerText =
+                "Email already exists!";
+
+            return;
+        }
+
         let user = {
+
+            id: Date.now(),
+
             name: name,
+
             email: email,
-            password: password
+
+            password: password,
+
+            followers: [],
+
+            following: []
         };
 
-        // GET OLD USERS
+        users.push(user);
 
-let users =
-    JSON.parse(localStorage.getItem("users")) || [];
-
-// CHECK IF EMAIL EXISTS
-
-let existingUser =
-    users.find(function(u) {
-
-        return u.email === email;
-    });
-
-if (existingUser) {
-
-    document.getElementById("signupError").innerText =
-        "Email already exists!";
-
-    return;
-}
-
-// ADD NEW USER
-
-users.push(user);
-
-// SAVE USERS
-
-localStorage.setItem(
-    "users",
-    JSON.stringify(users)
-);
+        localStorage.setItem(
+            "users",
+            JSON.stringify(users)
+        );
 
         alert("Account Created Successfully 🎉");
 
@@ -171,6 +174,12 @@ if (window.location.pathname.includes("profile.html")) {
 
         document.getElementById("profileEmail").innerText =
             user.email;
+
+        document.getElementById("followersCount").innerText =
+            user.followers.length;
+
+        document.getElementById("followingCount").innerText =
+            user.following.length;
     }
 }
 
@@ -178,7 +187,7 @@ if (window.location.pathname.includes("profile.html")) {
 
 function logout() {
 
-    localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
 
     alert("Logged out successfully");
 
@@ -188,13 +197,12 @@ function logout() {
 // ================= CREATE POST =================
 
 function createPost() {
-    alert("Button clicked");
 
     let postInput =
         document.getElementById("postInput");
 
     let postText =
-    postInput.value.trim();
+        postInput.value.trim();
 
     if (postText === "") {
 
@@ -214,8 +222,9 @@ function createPost() {
         id: Date.now(),
 
         username: user.name,
+
         avatar:
-`https://ui-avatars.com/api/?name=${user.name}`,
+            `https://ui-avatars.com/api/?name=${user.name}`,
 
         text: postText,
 
@@ -226,22 +235,14 @@ function createPost() {
         time: new Date().toLocaleString()
     };
 
-    // ADD NEWEST POST FIRST
-
     posts.unshift(newPost);
-
-    // SAVE POSTS
 
     localStorage.setItem(
         "posts",
         JSON.stringify(posts)
     );
 
-    // CLEAR INPUT
-
     postInput.value = "";
-
-    // RESET IMAGE PREVIEW
 
     let preview =
         document.getElementById("preview");
@@ -259,15 +260,9 @@ function createPost() {
         imageInput.value = "";
     }
 
-    // RESET CHARACTER COUNTER
-
     updateCounter();
 
-    // REFRESH POSTS
-
     displayPosts();
-
-    // UPDATE STATS
 
     updateStats();
 }
@@ -284,9 +279,10 @@ function displayPosts() {
     let posts =
         JSON.parse(localStorage.getItem("posts")) || [];
 
-    postsContainer.innerHTML = "";
+    let currentUser =
+        JSON.parse(localStorage.getItem("currentUser"));
 
-    // EMPTY FEED
+    postsContainer.innerHTML = "";
 
     if (posts.length === 0) {
 
@@ -299,9 +295,10 @@ function displayPosts() {
         return;
     }
 
-    // DISPLAY POSTS
-
     posts.forEach(function(post) {
+
+        let isFollowing =
+            currentUser.following.includes(post.username);
 
         postsContainer.innerHTML += `
 
@@ -309,14 +306,29 @@ function displayPosts() {
 
                 <div class="post-header">
 
-    <img
-        src="${post.avatar}"
-        class="avatar"
-    >
+                    <img
+                        src="${post.avatar}"
+                        class="avatar"
+                    >
 
-    <h3>${post.username}</h3>
+                    <h3>${post.username}</h3>
 
-</div>
+                    ${
+                        currentUser.name !== post.username
+                        ?
+                        `
+                        <button
+                            class="follow-btn"
+                            onclick="followUser('${post.username}')"
+                        >
+                            ${isFollowing ? "Following" : "Follow"}
+                        </button>
+                        `
+                        :
+                        ""
+                    }
+
+                </div>
 
                 <p>${post.text}</p>
 
@@ -361,9 +373,100 @@ function displayPosts() {
                     Edit
                 </button>
 
+                <button onclick="savePost(${post.id})">
+                    Save
+                </button>
+
             </div>
         `;
     });
+}
+
+// ================= FOLLOW USER =================
+
+function followUser(username) {
+
+    let currentUser =
+        JSON.parse(localStorage.getItem("currentUser"));
+
+    let users =
+        JSON.parse(localStorage.getItem("users")) || [];
+
+    if (currentUser.name === username) {
+
+        alert("You cannot follow yourself!");
+
+        return;
+    }
+
+    users = users.map(function(user) {
+
+        // CURRENT USER
+
+        if (user.email === currentUser.email) {
+
+            user.following =
+                user.following || [];
+
+            if (!user.following.includes(username)) {
+
+                user.following.push(username);
+            }
+        }
+
+        // TARGET USER
+
+        if (user.name === username) {
+
+            user.followers =
+                user.followers || [];
+
+            if (!user.followers.includes(currentUser.name)) {
+
+                user.followers.push(currentUser.name);
+            }
+        }
+
+        return user;
+    });
+
+    localStorage.setItem(
+        "users",
+        JSON.stringify(users)
+    );
+
+    // UPDATE CURRENT USER
+
+    let updatedCurrentUser =
+        users.find(function(user) {
+
+            return user.email === currentUser.email;
+        });
+
+    localStorage.setItem(
+        "currentUser",
+        JSON.stringify(updatedCurrentUser)
+    );
+
+    // NOTIFICATIONS
+
+    let notifications =
+        JSON.parse(localStorage.getItem("notifications")) || [];
+
+    notifications.unshift(
+        `You started following ${username}`
+    );
+
+    localStorage.setItem(
+        "notifications",
+        JSON.stringify(notifications)
+    );
+
+    loadNotifications();
+
+    displayPosts();
+
+    alert(`Now following ${username}`);
 }
 
 // ================= LIKE POST =================
@@ -463,9 +566,9 @@ function addComment(id) {
         document.getElementById(`comment-${id}`);
 
     let commentText =
-        commentInput.value;
+        commentInput.value.trim();
 
-    if (commentText.trim() === "") {
+    if (commentText === "") {
 
         return;
     }
@@ -476,8 +579,6 @@ function addComment(id) {
     posts = posts.map(function(post) {
 
         if (post.id === id) {
-
-            // SAFETY CHECK
 
             post.comments =
                 post.comments || [];
@@ -494,6 +595,26 @@ function addComment(id) {
     );
 
     displayPosts();
+}
+
+// ================= SAVE POST =================
+
+function savePost(id) {
+
+    let savedPosts =
+        JSON.parse(localStorage.getItem("savedPosts")) || [];
+
+    if (!savedPosts.includes(id)) {
+
+        savedPosts.push(id);
+
+        localStorage.setItem(
+            "savedPosts",
+            JSON.stringify(savedPosts)
+        );
+
+        alert("Post saved!");
+    }
 }
 
 // ================= IMAGE PREVIEW =================
@@ -585,11 +706,8 @@ function updateStats() {
     }
 }
 
-// ================= INITIAL LOAD =================
+// ================= NOTIFICATIONS =================
 
-displayPosts();
-
-updateStats();
 function showNotifications() {
 
     let panel =
@@ -597,3 +715,31 @@ function showNotifications() {
 
     panel.classList.toggle("show-notifications");
 }
+
+function loadNotifications() {
+
+    let panel =
+        document.getElementById("notificationPanel");
+
+    if (!panel) return;
+
+    let notifications =
+        JSON.parse(localStorage.getItem("notifications")) || [];
+
+    panel.innerHTML = "<h3>Notifications</h3>";
+
+    notifications.forEach(function(note) {
+
+        panel.innerHTML += `
+            <p>${note}</p>
+        `;
+    });
+}
+
+// ================= INITIAL LOAD =================
+
+displayPosts();
+
+updateStats();
+
+loadNotifications();
