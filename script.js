@@ -204,12 +204,59 @@ function createPost() {
     let postText =
         postInput.value.trim();
 
-    if (postText === "") {
+    let imageInput =
+        document.getElementById("imageInput");
+
+    let imageFile =
+        imageInput.files[0];
+
+    // CHECK EMPTY
+
+    if (
+        postText === "" &&
+        !imageFile
+    ) {
 
         alert("Post cannot be empty!");
 
         return;
     }
+
+    // IF IMAGE EXISTS
+
+    if (imageFile) {
+
+        let reader = new FileReader();
+
+        reader.onload = function() {
+
+            savePostData(reader.result);
+        };
+
+        reader.readAsDataURL(imageFile);
+
+    } else {
+
+        savePostData("");
+    }
+}
+
+    updateCounter();
+
+    displayPosts();
+
+    updateStats();
+
+function savePostData(imageUrl) {
+
+    let postInput =
+        document.getElementById("postInput");
+
+    let postText =
+        postInput.value.trim();
+
+    let category =
+        document.getElementById("categorySelect").value;
 
     let user =
         JSON.parse(localStorage.getItem("currentUser"));
@@ -228,6 +275,10 @@ function createPost() {
 
         text: postText,
 
+        image: imageUrl,
+
+        category: category,
+
         likes: 0,
 
         comments: [],
@@ -242,31 +293,21 @@ function createPost() {
         JSON.stringify(posts)
     );
 
+    // CLEAR INPUTS
+
     postInput.value = "";
 
-    let preview =
-        document.getElementById("preview");
+    document.getElementById("imageInput").value = "";
 
-    let imageInput =
-        document.getElementById("imageInput");
+    document.getElementById("preview").style.display =
+        "none";
 
-    if (preview) {
-
-        preview.style.display = "none";
-    }
-
-    if (imageInput) {
-
-        imageInput.value = "";
-    }
-
-    updateCounter();
+    // REFRESH POSTS
 
     displayPosts();
 
     updateStats();
 }
-
 // ================= DISPLAY POSTS =================
 
 function displayPosts() {
@@ -331,6 +372,24 @@ function displayPosts() {
                 </div>
 
                 <p>${post.text}</p>
+
+${
+    post.image
+    ?
+    `
+    <img
+        src="${post.image}"
+        class="post-image"
+    >
+    `
+    :
+    ""
+}
+
+<p>
+    <strong>Category:</strong>
+    ${post.category}
+</p>
 
                 <small>${post.time}</small>
 
@@ -688,8 +747,24 @@ function searchPosts() {
 function toggleDarkMode() {
 
     document.body.classList.toggle("dark-mode");
-}
 
+    if (
+        document.body.classList.contains("dark-mode")
+    ) {
+
+        localStorage.setItem(
+            "theme",
+            "dark"
+        );
+
+    } else {
+
+        localStorage.setItem(
+            "theme",
+            "light"
+        );
+    }
+}
 // ================= UPDATE STATS =================
 
 function updateStats() {
@@ -743,3 +818,140 @@ displayPosts();
 updateStats();
 
 loadNotifications();
+let savedTheme =
+    localStorage.getItem("theme");
+
+if (savedTheme === "dark") {
+
+    document.body.classList.add("dark-mode");
+}
+
+function loadExplorePosts() {
+
+    let container =
+        document.getElementById("explorePosts");
+
+    if (!container) return;
+
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
+
+    container.innerHTML = "";
+
+    posts.forEach(function(post) {
+
+        container.innerHTML += `
+
+            <div class="post">
+
+                <div class="post-header">
+
+                    <img
+                        src="${post.avatar}"
+                        class="avatar"
+                    >
+
+                    <h3>${post.username}</h3>
+
+                </div>
+
+                <p>${post.text}</p>
+
+                <small>${post.time}</small>
+
+            </div>
+        `;
+    });
+}
+loadExplorePosts();
+function loadSavedPosts() {
+
+    let container =
+        document.getElementById("savedPostsContainer");
+
+    if (!container) return;
+
+    let savedPosts =
+        JSON.parse(localStorage.getItem("savedPosts")) || [];
+
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
+
+    container.innerHTML = "";
+
+    let filteredPosts =
+        posts.filter(function(post) {
+
+            return savedPosts.includes(post.id);
+        });
+
+    if (filteredPosts.length === 0) {
+
+        container.innerHTML =
+            "<p>No saved posts yet ⭐</p>";
+
+        return;
+    }
+
+    filteredPosts.forEach(function(post) {
+
+        container.innerHTML += `
+
+            <div class="post">
+
+                <div class="post-header">
+
+                    <img
+                        src="${post.avatar}"
+                        class="avatar"
+                    >
+
+                    <h3>${post.username}</h3>
+
+                </div>
+
+                <p>${post.text}</p>
+
+                <small>${post.time}</small>
+
+            </div>
+        `;
+    });
+}
+loadSavedPosts();
+function loadSuggestedUsers() {
+
+    let container =
+        document.getElementById("suggestedUsers");
+
+    if (!container) return;
+
+    let users =
+        JSON.parse(localStorage.getItem("users")) || [];
+
+    let currentUser =
+        JSON.parse(localStorage.getItem("currentUser"));
+
+    container.innerHTML = "";
+
+    users.forEach(function(user) {
+
+        if (user.email !== currentUser.email) {
+
+            container.innerHTML += `
+
+                <div class="suggest-user">
+
+                    <img
+                        src="https://ui-avatars.com/api/?name=${user.name}"
+                        class="avatar"
+                    >
+
+                    <p>${user.name}</p>
+
+                </div>
+            `;
+        }
+    });
+}
+loadSuggestedUsers();

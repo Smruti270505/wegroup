@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>WeGroup - Dashboard</title>
+    <title>WeGroupp - Dashboard</title>
 
     <link rel="stylesheet" href="style.css">
 
@@ -33,6 +33,9 @@
             <a href="dashboard.html">Home</a>
 
             <a href="profile.html">Profile</a>
+            <a href="explore.html">Explore</a>
+
+            <a href="saved.html">Saved</a>
 
             <!-- NOTIFICATION BUTTON -->
 
@@ -107,6 +110,11 @@
             </ul>
 
         </div>
+        <hr>
+
+<h3>Suggested Users</h3>
+
+<div id="suggestedUsers"></div>
 
         <!-- ================= FEED ================= -->
 
@@ -127,6 +135,26 @@
                 placeholder="What's on your mind?"
                 oninput="updateCounter()"
             ></textarea>
+
+            <select id="categorySelect">
+
+    <option value="General">
+        General
+    </option>
+
+    <option value="Coding">
+        Coding
+    </option>
+
+    <option value="Study">
+        Study
+    </option>
+
+    <option value="Fun">
+        Fun
+    </option>
+
+</select>
 
             <!-- IMAGE INPUT -->
 

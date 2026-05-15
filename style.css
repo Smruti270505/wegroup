@@ -463,3 +463,34 @@ textarea {
         width: 100%;
     }
 }
+/* SUGGESTED USERS */
+
+.suggest-user {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 10px;
+}
+
+.suggest-user p {
+
+    margin: 0;
+}
+/* POST IMAGE */
+
+.post-image {
+
+    width: 100%;
+
+    margin-top: 15px;
+
+    border-radius: 10px;
+
+    max-height: 400px;
+
+    object-fit: cover;
+}
