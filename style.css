@@ -494,3 +494,26 @@ textarea {
 
     object-fit: cover;
 }
+/* ONLINE USERS */
+
+#onlineUsers p {
+
+    margin: 5px 0;
+}
+
+/* NOTIFICATION COUNT */
+
+#notificationCount {
+
+    background-color: red;
+
+    color: white;
+
+    padding: 2px 6px;
+
+    border-radius: 50%;
+
+    font-size: 12px;
+
+    margin-left: 5px;
+}

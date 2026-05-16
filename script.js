@@ -174,6 +174,8 @@ if (window.location.pathname.includes("profile.html")) {
 
         document.getElementById("profileEmail").innerText =
             user.email;
+        document.getElementById("profileBio").innerText =
+            user.bio || "No bio added yet.";
 
         document.getElementById("followersCount").innerText =
             user.followers.length;
@@ -434,6 +436,9 @@ ${
 
                 <button onclick="savePost(${post.id})">
                     Save
+                </button>
+                <button onclick="sharePost(${post.id})">
+                    Share
                 </button>
 
             </div>
@@ -955,3 +960,125 @@ function loadSuggestedUsers() {
     });
 }
 loadSuggestedUsers();
+function saveBio() {
+
+    let bio =
+        document.getElementById("bioInput").value;
+
+    let currentUser =
+        JSON.parse(localStorage.getItem("currentUser"));
+
+    let users =
+        JSON.parse(localStorage.getItem("users")) || [];
+
+    users = users.map(function(user) {
+
+        if (user.email === currentUser.email) {
+
+            user.bio = bio;
+        }
+
+        return user;
+    });
+
+    localStorage.setItem(
+        "users",
+        JSON.stringify(users)
+    );
+
+    currentUser.bio = bio;
+
+    localStorage.setItem(
+        "currentUser",
+        JSON.stringify(currentUser)
+    );
+
+    alert("Bio updated!");
+}
+if (window.location.pathname.includes("settings.html")) {
+
+    let currentUser =
+        JSON.parse(localStorage.getItem("currentUser"));
+
+    if (currentUser) {
+
+        document.getElementById("bioInput").value =
+            currentUser.bio || "";
+    }
+}
+function sharePost(id) {
+
+    let postLink =
+        `https://wegroup.com/post/${id}`;
+
+    navigator.clipboard.writeText(postLink);
+
+    alert("Post link copied!");
+}
+function sortPosts(type) {
+
+    let posts =
+        JSON.parse(localStorage.getItem("posts")) || [];
+
+    if (type === "liked") {
+
+        posts.sort(function(a, b) {
+
+            return b.likes - a.likes;
+        });
+
+    } else {
+
+        posts.sort(function(a, b) {
+
+            return b.id - a.id;
+        });
+    }
+
+    localStorage.setItem(
+        "posts",
+        JSON.stringify(posts)
+    );
+
+    displayPosts();
+}
+function loadOnlineUsers() {
+
+    let container =
+        document.getElementById("onlineUsers");
+
+    if (!container) return;
+
+    let users =
+        JSON.parse(localStorage.getItem("users")) || [];
+
+    container.innerHTML = "";
+
+    users.forEach(function(user) {
+
+        if (user.online) {
+
+            container.innerHTML += `
+
+                <p>🟢 ${user.name}</p>
+
+            `;
+        }
+    });
+}
+function updateNotificationCount() {
+
+    let notifications =
+        JSON.parse(localStorage.getItem("notifications")) || [];
+
+    let count =
+        document.getElementById("notificationCount");
+
+    if (count) {
+
+        count.innerText = notifications.length;
+    }
+}
+loadOnlineUsers();
+
+updateNotificationCount();

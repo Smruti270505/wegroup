@@ -33,6 +33,7 @@
             <a href="dashboard.html">Home</a>
 
             <a href="profile.html">Profile</a>
+            <a href="settings.html">Settings</a>
             <a href="explore.html">Explore</a>
 
             <a href="saved.html">Saved</a>
@@ -40,8 +41,14 @@
             <!-- NOTIFICATION BUTTON -->
 
             <button onclick="showNotifications()">
-                🔔
-            </button>
+
+    🔔
+
+    <span id="notificationCount">
+        0
+    </span>
+
+</button>
 
             <!-- DARK MODE BUTTON -->
 
@@ -115,6 +122,11 @@
 <h3>Suggested Users</h3>
 
 <div id="suggestedUsers"></div>
+<hr>
+
+<h3>Online Users 🟢</h3>
+
+<div id="onlineUsers"></div>
 
         <!-- ================= FEED ================= -->
 
@@ -195,7 +207,17 @@
             <hr>
 
             <!-- POSTS CONTAINER -->
+            <select onchange="sortPosts(this.value)">
 
+    <option value="newest">
+        Newest
+    </option>
+
+    <option value="liked">
+        Most Liked
+    </option>
+
+</select>
             <div id="postsContainer"></div>
 
         </div>
