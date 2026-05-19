@@ -2,16 +2,20 @@ const express = require("express");
 
 const router = express.Router();
 
-// USERS ROUTE
+const {
 
-router.get("/", function(req, res) {
+    signup,
 
-    res.json([
-        {
-            id: 1,
-            name: "Chiku"
-        }
-    ]);
-});
+    login
+
+} = require("../controllers/userController");
+
+// SIGNUP ROUTE
+
+router.post("/signup", signup);
+
+// LOGIN ROUTE
+
+router.post("/login", login);
 
 module.exports = router;

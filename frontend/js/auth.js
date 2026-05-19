@@ -4,133 +4,136 @@ function startApp() {
 
 // ================= LOGIN =================
 
-let loginForm = document.getElementById("loginForm");
+let loginForm =
+    document.getElementById("loginForm");
 
 if (loginForm) {
 
-    loginForm.addEventListener("submit", function(e) {
+    loginForm.addEventListener(
+        "submit",
+        async function(e) {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        let email =
-            document.getElementById("loginEmail").value;
+            let email =
+                document.getElementById("loginEmail").value;
 
-        let password =
-            document.getElementById("loginPassword").value;
+            let password =
+                document.getElementById("loginPassword").value;
 
-        let users =
-            JSON.parse(localStorage.getItem("users")) || [];
+            try {
 
-        let storedUser =
-            users.find(function(user) {
+                let response =
+                    await fetch(
+                        "http://localhost:5000/users/login",
+                        {
 
-                return (
-                    user.email === email &&
-                    user.password === password
-                );
-            });
+                            method: "POST",
 
-        if (!storedUser) {
+                            headers: {
 
-            document.getElementById("loginError").innerText =
-                "Invalid email or password!";
+                                "Content-Type":
+                                    "application/json"
+                            },
 
-            return;
+                            body: JSON.stringify({
+
+                                email,
+                                password
+                            })
+                        }
+                    );
+
+                let data =
+                    await response.json();
+
+                alert(data.message);
+
+                if (response.ok) {
+
+                    localStorage.setItem(
+                        "currentUser",
+                        JSON.stringify(data.user)
+                    );
+
+                    window.location.href =
+                        "dashboard.html";
+                }
+
+            } catch(error) {
+
+                console.log(error);
+
+                alert("Login failed");
+            }
         }
-
-        localStorage.setItem(
-            "currentUser",
-            JSON.stringify(storedUser)
-        );
-
-        alert("Login Successful 🚀");
-
-        window.location.href = "dashboard.html";
-    });
+    );
 }
-
 // ================= SIGNUP =================
 
-let signupForm = document.getElementById("signupForm");
+let signupForm =
+    document.getElementById("signupForm");
 
 if (signupForm) {
 
-    signupForm.addEventListener("submit", function(e) {
+    signupForm.addEventListener(
+        "submit",
+        async function(e) {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        let name =
-            document.getElementById("name").value;
+            let name =
+                document.getElementById("name").value;
 
-        let email =
-            document.getElementById("email").value;
+            let email =
+                document.getElementById("email").value;
 
-        let password =
-            document.getElementById("password").value;
+            let password =
+                document.getElementById("password").value;
 
-        if (
-            name === "" ||
-            email === "" ||
-            password === ""
-        ) {
+            try {
 
-            document.getElementById("signupError").innerText =
-                "All fields are required!";
+                let response =
+                    await fetch(
+                        "http://localhost:5000/users/signup",
+                        {
 
-            return;
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                name,
+                                email,
+                                password
+                            })
+                        }
+                    );
+
+                let data =
+                    await response.json();
+
+                alert(data.message);
+
+                if (response.ok) {
+
+                    window.location.href =
+                        "login.html";
+                }
+
+            } catch(error) {
+
+                console.log(error);
+
+                alert("Signup failed");
+            }
         }
-
-        if (password.length < 6) {
-
-            document.getElementById("signupError").innerText =
-                "Password must be at least 6 characters";
-
-            return;
-        }
-
-        let users =
-            JSON.parse(localStorage.getItem("users")) || [];
-
-        let existingUser =
-            users.find(function(user) {
-
-                return user.email === email;
-            });
-
-        if (existingUser) {
-
-            document.getElementById("signupError").innerText =
-                "Email already exists!";
-
-            return;
-        }
-
-        let user = {
-
-            id: Date.now(),
-
-            name: name,
-
-            email: email,
-
-            password: password,
-
-            followers: [],
-
-            following: []
-        };
-
-        users.push(user);
-
-        localStorage.setItem(
-            "users",
-            JSON.stringify(users)
-        );
-
-        alert("Account Created Successfully 🎉");
-
-        window.location.href = "login.html";
-    });
+    );
 }
 // ================= LOGOUT =================
 
