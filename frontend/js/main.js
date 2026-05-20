@@ -62,7 +62,7 @@ if (window.location.pathname.includes("profile.html")) {
 
 // ================= INITIAL LOAD =================
 
-displayPosts();
+loadPosts();
 
 updateStats();
 

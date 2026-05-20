@@ -1,251 +1,111 @@
 // ================= CREATE POST =================
 
-function createPost() {
+async function createPost() {
 
     let postInput =
         document.getElementById("postInput");
 
-    let postText =
+    let content =
         postInput.value.trim();
 
-    let imageInput =
-        document.getElementById("imageInput");
-
-    let imageFile =
-        imageInput.files[0];
-
-    // CHECK EMPTY
-
-    if (
-        postText === "" &&
-        !imageFile
-    ) {
+    if (!content) {
 
         alert("Post cannot be empty!");
 
         return;
     }
 
-    // IF IMAGE EXISTS
-
-    if (imageFile) {
-
-        let reader = new FileReader();
-
-        reader.onload = function() {
-
-            savePostData(reader.result);
-        };
-
-        reader.readAsDataURL(imageFile);
-
-    } else {
-
-        savePostData("");
-    }
-}
-
-    updateCounter();
-
-    displayPosts();
-
-    updateStats();
-
-function savePostData(imageUrl) {
-
-    let postInput =
-        document.getElementById("postInput");
-
-    let postText =
-        postInput.value.trim();
-
-    let category =
-        document.getElementById("categorySelect").value;
-
-    let user =
+    let currentUser =
         JSON.parse(localStorage.getItem("currentUser"));
 
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
+    try {
 
-    let newPost = {
+        let response =
+            await fetch(
+                "http://localhost:5000/posts",
+                {
 
-        id: Date.now(),
+                    method: "POST",
 
-        username: user.name,
+                    headers: {
 
-        avatar:
-            `https://ui-avatars.com/api/?name=${user.name}`,
+                        "Content-Type":
+                            "application/json"
+                    },
 
-        text: postText,
+                    body: JSON.stringify({
 
-        image: imageUrl,
+                        username: currentUser.name,
 
-        category: category,
+                        content
+                    })
+                }
+            );
 
-        likes: 0,
+        let data =
+            await response.json();
 
-        comments: [],
+        alert(data.message);
 
-        time: new Date().toLocaleString()
-    };
+        postInput.value = "";
 
-    posts.unshift(newPost);
+        loadPosts();
 
-    localStorage.setItem(
-        "posts",
-        JSON.stringify(posts)
-    );
+    } catch(error) {
 
-    // CLEAR INPUTS
+        console.log(error);
 
-    postInput.value = "";
-
-    document.getElementById("imageInput").value = "";
-
-    document.getElementById("preview").style.display =
-        "none";
+        alert("Failed to create post");
+    }
+}
 
     // REFRESH POSTS
 
     displayPosts();
 
     updateStats();
-}
-// ================= DISPLAY POSTS =================
 
-function displayPosts() {
+async function loadPosts() {
 
     let postsContainer =
         document.getElementById("postsContainer");
 
     if (!postsContainer) return;
 
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
+    try {
 
-    let currentUser =
-        JSON.parse(localStorage.getItem("currentUser"));
+        let response =
+            await fetch(
+                "http://localhost:5000/posts"
+            );
 
-    postsContainer.innerHTML = "";
+        let posts =
+            await response.json();
 
-    if (posts.length === 0) {
+        postsContainer.innerHTML = "";
 
-        postsContainer.innerHTML = `
-            <p class="empty-message">
-                No posts yet. Start posting 🚀
-            </p>
-        `;
+        posts.forEach(function(post) {
 
-        return;
-    }
+            postsContainer.innerHTML += `
 
-    posts.forEach(function(post) {
-
-        let isFollowing =
-            currentUser.following.includes(post.username);
-
-        postsContainer.innerHTML += `
-
-            <div class="post">
-
-                <div class="post-header">
-
-                    <img
-                        src="${post.avatar}"
-                        class="avatar"
-                    >
+                <div class="post">
 
                     <h3>${post.username}</h3>
 
-                    ${
-                        currentUser.name !== post.username
-                        ?
-                        `
-                        <button
-                            class="follow-btn"
-                            onclick="followUser('${post.username}')"
-                        >
-                            ${isFollowing ? "Following" : "Follow"}
-                        </button>
-                        `
-                        :
-                        ""
-                    }
+                    <p>${post.content}</p>
+
+                    <small>${post.time}</small>
 
                 </div>
+            `;
+        });
 
-                <p>${post.text}</p>
+    } catch(error) {
 
-${
-    post.image
-    ?
-    `
-    <img
-        src="${post.image}"
-        class="post-image"
-    >
-    `
-    :
-    ""
-}
+        console.log(error);
 
-<p>
-    <strong>Category:</strong>
-    ${post.category}
-</p>
-
-                <small>${post.time}</small>
-
-                <div class="comments">
-
-                    ${
-                        (post.comments || [])
-                        .map(function(comment) {
-
-                            return `
-                                <p>💬 ${comment}</p>
-                            `;
-                        })
-                        .join("")
-                    }
-
-                </div>
-
-                <input
-                    type="text"
-                    id="comment-${post.id}"
-                    placeholder="Write a comment..."
-                >
-
-                <button onclick="addComment(${post.id})">
-                    Comment
-                </button>
-
-                <br><br>
-
-                <button onclick="likePost(${post.id})">
-                    ❤️ ${post.likes}
-                </button>
-
-                <button onclick="deletePost(${post.id})">
-                    Delete
-                </button>
-
-                <button onclick="editPost(${post.id})">
-                    Edit
-                </button>
-
-                <button onclick="savePost(${post.id})">
-                    Save
-                </button>
-                <button onclick="sharePost(${post.id})">
-                    Share
-                </button>
-
-            </div>
-        `;
-    });
+        alert("Failed to load posts");
+    }
 }
 // ================= FOLLOW USER =================
 
