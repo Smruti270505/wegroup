@@ -1,91 +1,138 @@
 // TEMPORARY USERS ARRAY
+const User = require("../models/User");
 
-let users = [];
 
 // SIGNUP CONTROLLER
 
-function signup(req, res) {
+async function signup(req, res) {
 
-    let { name, email, password } = req.body;
+    try {
 
-    // CHECK EMPTY
+        let {
 
-    if (!name || !email || !password) {
+            name,
 
-        return res.status(400).json({
+            email,
 
-            message: "All fields required"
+            password
+
+        } = req.body;
+
+        // CHECK EMPTY
+
+        if (!name || !email || !password) {
+
+            return res.status(400).json({
+
+                message: "All fields required"
+            });
+        }
+
+        // CHECK EXISTING USER
+
+        let existingUser =
+            await User.findOne({
+
+                email: email
+            });
+
+        if (existingUser) {
+
+            return res.status(400).json({
+
+                message: "User already exists"
+            });
+        }
+
+        // CREATE USER
+
+        let newUser = new User({
+
+            name,
+
+            email,
+
+            password
+        });
+
+        // SAVE TO DATABASE
+
+        await newUser.save();
+
+        res.status(201).json({
+
+            message: "Signup successful",
+
+            user: newUser
+        });
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message: "Server error"
         });
     }
-
-    // CHECK EXISTING USER
-
-    let existingUser = users.find(function(user) {
-
-        return user.email === email;
-    });
-
-    if (existingUser) {
-
-        return res.status(400).json({
-
-            message: "User already exists"
-        });
-    }
-
-    // CREATE USER
-
-    let newUser = {
-
-        id: Date.now(),
-
-        name,
-
-        email,
-
-        password
-    };
-
-    users.push(newUser);
-
-    res.status(201).json({
-
-        message: "Signup successful",
-
-        user: newUser
-    });
 }
-
 // LOGIN CONTROLLER
 
-function login(req, res) {
+async function login(req, res) {
 
-    let { email, password } = req.body;
+    try {
 
-    let user = users.find(function(user) {
+        let {
 
-        return (
-            user.email === email &&
-            user.password === password
-        );
-    });
+            email,
 
-    if (!user) {
+            password
 
-        return res.status(401).json({
+        } = req.body;
 
-            message: "Invalid credentials"
+        // FIND USER
+
+        let user =
+            await User.findOne({
+
+                email: email
+            });
+
+        if (!user) {
+
+            return res.status(401).json({
+
+                message: "User not found"
+            });
+        }
+
+        // CHECK PASSWORD
+
+        if (user.password !== password) {
+
+            return res.status(401).json({
+
+                message: "Invalid password"
+            });
+        }
+
+        res.status(200).json({
+
+            message: "Login successful",
+
+            user
+        });
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message: "Server error"
         });
     }
-
-    res.status(200).json({
-
-        message: "Login successful",
-
-        user
-    });
 }
-
 module.exports = {
 
     signup,

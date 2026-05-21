@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express = require("express");
 
 const cors = require("cors");
@@ -11,6 +12,22 @@ const postRoutes =
 const app = express();
 
 const PORT = 5000;
+
+mongoose.connect(
+"mongodb://wegroupadmin:Chiku99@ac-qvubivh-shard-00-00.h4zy5qn.mongodb.net:27017,ac-qvubivh-shard-00-01.h4zy5qn.mongodb.net:27017,ac-qvubivh-shard-00-02.h4zy5qn.mongodb.net:27017/?ssl=true&replicaSet=atlas-1ue6c1-shard-0&authSource=admin&appName=WeGroupCluster"
+)
+
+.then(function() {
+
+    console.log("MongoDB Connected 🚀");
+
+})
+
+.catch(function(error) {
+
+    console.log(error);
+});
+
 
 // MIDDLEWARE
 

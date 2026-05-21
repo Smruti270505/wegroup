@@ -1,49 +1,74 @@
-let posts = [];
+const Post = require("../models/Post");
 
 // CREATE POST
 
-function createPost(req, res) {
+async function createPost(req, res) {
 
-    let { content, username } = req.body;
+    try {
 
-    if (!content) {
+        let {
 
-        return res.status(400).json({
+            username,
 
-            message: "Post content required"
+            content
+
+        } = req.body;
+
+        if (!content) {
+
+            return res.status(400).json({
+
+                message: "Post content required"
+            });
+        }
+
+        let newPost = new Post({
+
+            username,
+
+            content
+        });
+
+        await newPost.save();
+
+        res.status(201).json({
+
+            message: "Post created",
+
+            post: newPost
+        });
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message: "Server error"
         });
     }
-
-    let newPost = {
-
-        id: Date.now(),
-
-        username,
-
-        content,
-
-        likes: 0,
-
-        comments: [],
-
-        time: new Date().toLocaleString()
-    };
-
-    posts.unshift(newPost);
-
-    res.status(201).json({
-
-        message: "Post created",
-
-        post: newPost
-    });
 }
 
 // GET POSTS
 
-function getPosts(req, res) {
+async function getPosts(req, res) {
 
-    res.status(200).json(posts);
+    try {
+
+        let posts =
+            await Post.find();
+
+        res.status(200).json(posts);
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message: "Server error"
+        });
+    }
 }
 
 module.exports = {
