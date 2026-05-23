@@ -1,3 +1,6 @@
+const bcrypt = require("bcryptjs");
+
+const jwt = require("jsonwebtoken");
 // TEMPORARY USERS ARRAY
 const User = require("../models/User");
 
@@ -46,14 +49,21 @@ async function signup(req, res) {
 
         // CREATE USER
 
-        let newUser = new User({
+        // HASH PASSWORD
 
-            name,
+let hashedPassword =
+    await bcrypt.hash(password, 10);
 
-            email,
+// CREATE USER
 
-            password
-        });
+let newUser = new User({
+
+    name,
+
+    email,
+
+    password: hashedPassword
+});
 
         // SAVE TO DATABASE
 
@@ -108,7 +118,15 @@ async function login(req, res) {
 
         // CHECK PASSWORD
 
-        if (user.password !== password) {
+        let isMatch =
+            await bcrypt.compare(
+
+                password,
+
+                user.password
+            );
+
+        if (!isMatch) {
 
             return res.status(401).json({
 
@@ -116,9 +134,30 @@ async function login(req, res) {
             });
         }
 
+        // CREATE TOKEN
+
+        let token = jwt.sign(
+
+            {
+
+                id: user._id
+            },
+
+            process.env.JWT_SECRET,
+
+            {
+
+                expiresIn: "7d"
+            }
+        );
+
+        // SUCCESS RESPONSE
+
         res.status(200).json({
 
             message: "Login successful",
+
+            token,
 
             user
         });
