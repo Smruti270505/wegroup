@@ -25,34 +25,76 @@ if (window.location.pathname.includes("dashboard.html")) {
 
 // ================= PROFILE PAGE =================
 
-if (window.location.pathname.includes("profile.html")) {
+// ================= PROFILE PAGE =================
 
-    let user =
-        JSON.parse(localStorage.getItem("currentUser"));
+if (
+    window.location.pathname.includes(
+        "profile.html"
+    )
+) {
 
-    if (!user) {
-
-        window.location.href = "login.html";
-
-    } else {
-
-        document.getElementById("profileName").innerText =
-            user.name;
-
-        document.getElementById("profileEmail").innerText =
-            user.email;
-        document.getElementById("profileBio").innerText =
-            user.bio || "No bio added yet.";
-
-        document.getElementById("followersCount").innerText =
-            user.followers.length;
-
-        document.getElementById("followingCount").innerText =
-            user.following.length;
-    }
+    loadProfile();
 }
 
+async function loadProfile() {
 
+    let currentUser =
+        JSON.parse(
+
+            localStorage.getItem(
+                "currentUser"
+            ) || "{}"
+        );
+
+    if (!currentUser.email) {
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+    try {
+
+        let response =
+            await fetch(
+
+                `http://localhost:5000/users/${currentUser.email}`
+            );
+
+        let user =
+            await response.json();
+
+        document.getElementById(
+            "profileName"
+        ).innerText = user.name;
+
+        document.getElementById(
+            "profileEmail"
+        ).innerText = user.email;
+
+        document.getElementById(
+            "followersCount"
+        ).innerText =
+            user.followers.length;
+
+        document.getElementById(
+            "followingCount"
+        ).innerText =
+            user.following.length;
+
+        document.getElementById(
+            "profileBio"
+        ).innerText =
+            user.bio || "No bio yet";
+
+    } catch(error) {
+
+        console.log(error);
+
+        alert("Failed to load profile");
+    }
+}
 
 
 

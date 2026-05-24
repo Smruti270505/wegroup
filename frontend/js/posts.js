@@ -16,13 +16,23 @@ async function createPost() {
     }
 
     let currentUser =
-        JSON.parse(localStorage.getItem("currentUser"));
+        JSON.parse(
+
+            localStorage.getItem(
+                "currentUser"
+            ) || "{}"
+        );
+
+    let token =
+        localStorage.getItem("token");
 
     try {
 
         let response =
             await fetch(
+
                 "http://localhost:5000/posts",
+
                 {
 
                     method: "POST",
@@ -30,12 +40,16 @@ async function createPost() {
                     headers: {
 
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
                     },
 
                     body: JSON.stringify({
 
-                        username: currentUser.name,
+                        username:
+                            currentUser.name,
 
                         content
                     })
@@ -59,16 +73,14 @@ async function createPost() {
     }
 }
 
-    // REFRESH POSTS
-
-    displayPosts();
-
-    updateStats();
+// ================= LOAD POSTS =================
 
 async function loadPosts() {
 
     let postsContainer =
-        document.getElementById("postsContainer");
+        document.getElementById(
+            "postsContainer"
+        );
 
     if (!postsContainer) return;
 
@@ -84,17 +96,107 @@ async function loadPosts() {
 
         postsContainer.innerHTML = "";
 
+        posts.reverse();
+
         posts.forEach(function(post) {
 
             postsContainer.innerHTML += `
 
                 <div class="post">
 
-                    <h3>${post.username}</h3>
+                    <div class="post-header">
 
-                    <p>${post.content}</p>
+                        <img
+                            src="https://ui-avatars.com/api/?name=${post.username}"
+                            class="avatar"
+                        >
 
-                    <small>${post.time}</small>
+                        <div>
+
+                            <h3>${post.username}</h3>
+
+                            <small>${post.time}</small>
+
+                        </div>
+
+                    </div>
+
+                    <p class="post-content">
+
+                        ${post.content}
+
+                    </p>
+
+                    <div class="post-actions">
+
+                        <button onclick="likePost('${post._id}')">
+
+                            ❤️ ${post.likes.length}
+
+                        </button>
+
+                        <button onclick="toggleCommentBox('${post._id}')">
+
+                            💬 Comment
+
+                        </button>
+
+                        <button onclick="sharePost()">
+
+                            📤 Share
+
+                        </button>
+
+                        <button onclick="followUser('${post.username}')">
+
+                            ➕ Follow
+
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="commentBox-${post._id}"
+                        class="comment-box"
+                        style="display:none;"
+                    >
+
+                        <input
+                            type="text"
+                            placeholder="Write comment..."
+                            id="commentInput-${post._id}"
+                        >
+
+                        <button onclick="addComment('${post._id}')">
+
+                            Post
+
+                        </button>
+
+                        <div class="comments-list">
+
+                            ${post.comments.map(function(comment) {
+
+                                return `
+
+                                    <p>
+
+                                        <strong>
+
+                                            ${comment.username}
+
+                                        </strong>
+
+                                        : ${comment.text}
+
+                                    </p>
+                                `;
+
+                            }).join("")}
+
+                        </div>
+
+                    </div>
 
                 </div>
             `;
@@ -107,313 +209,287 @@ async function loadPosts() {
         alert("Failed to load posts");
     }
 }
-// ================= FOLLOW USER =================
-
-function followUser(username) {
-
-    let currentUser =
-        JSON.parse(localStorage.getItem("currentUser"));
-
-    let users =
-        JSON.parse(localStorage.getItem("users")) || [];
-
-    if (currentUser.name === username) {
-
-        alert("You cannot follow yourself!");
-
-        return;
-    }
-
-    users = users.map(function(user) {
-
-        // CURRENT USER
-
-        if (user.email === currentUser.email) {
-
-            user.following =
-                user.following || [];
-
-            if (!user.following.includes(username)) {
-
-                user.following.push(username);
-            }
-        }
-
-        // TARGET USER
-
-        if (user.name === username) {
-
-            user.followers =
-                user.followers || [];
-
-            if (!user.followers.includes(currentUser.name)) {
-
-                user.followers.push(currentUser.name);
-            }
-        }
-
-        return user;
-    });
-
-    localStorage.setItem(
-        "users",
-        JSON.stringify(users)
-    );
-
-    // UPDATE CURRENT USER
-
-    let updatedCurrentUser =
-        users.find(function(user) {
-
-            return user.email === currentUser.email;
-        });
-
-    localStorage.setItem(
-        "currentUser",
-        JSON.stringify(updatedCurrentUser)
-    );
-
-    // NOTIFICATIONS
-
-    let notifications =
-        JSON.parse(localStorage.getItem("notifications")) || [];
-
-    notifications.unshift(
-        `You started following ${username}`
-    );
-
-    localStorage.setItem(
-        "notifications",
-        JSON.stringify(notifications)
-    );
-
-    loadNotifications();
-
-    displayPosts();
-
-    alert(`Now following ${username}`);
-}
 
 // ================= LIKE POST =================
 
-function likePost(id) {
+async function likePost(postId) {
 
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
+    let currentUser =
+        JSON.parse(
 
-    posts = posts.map(function(post) {
+            localStorage.getItem(
+                "currentUser"
+            ) || "{}"
+        );
 
-        if (post.id === id) {
+    try {
 
-            post.likes++;
-        }
+        await fetch(
 
-        return post;
-    });
+            `http://localhost:5000/posts/like/${postId}`,
 
-    localStorage.setItem(
-        "posts",
-        JSON.stringify(posts)
-    );
+            {
 
-    displayPosts();
-}
+                method: "PUT",
 
-// ================= DELETE POST =================
+                headers: {
 
-function deletePost(id) {
+                    "Content-Type":
+                        "application/json"
+                },
 
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
+                body: JSON.stringify({
 
-    posts = posts.filter(function(post) {
+                    username:
+                        currentUser.email
+                })
+            }
+        );
 
-        return post.id !== id;
-    });
+        loadPosts();
 
-    localStorage.setItem(
-        "posts",
-        JSON.stringify(posts)
-    );
+    } catch(error) {
 
-    displayPosts();
+        console.log(error);
 
-    updateStats();
-}
-
-// ================= EDIT POST =================
-
-function editPost(id) {
-
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
-
-    let post =
-        posts.find(function(p) {
-
-            return p.id === id;
-        });
-
-    let updatedText =
-        prompt("Edit your post:", post.text);
-
-    if (
-        updatedText === null ||
-        updatedText.trim() === ""
-    ) {
-
-        return;
+        alert("Failed to like post");
     }
+}
 
-    posts = posts.map(function(p) {
+// ================= TOGGLE COMMENT =================
 
-        if (p.id === id) {
+function toggleCommentBox(postId) {
 
-            p.text = updatedText;
-        }
+    let box =
+        document.getElementById(
+            `commentBox-${postId}`
+        );
 
-        return p;
-    });
+    if (box.style.display === "none") {
 
-    localStorage.setItem(
-        "posts",
-        JSON.stringify(posts)
-    );
+        box.style.display = "block";
 
-    displayPosts();
+    } else {
+
+        box.style.display = "none";
+    }
 }
 
 // ================= ADD COMMENT =================
 
-function addComment(id) {
+async function addComment(postId) {
 
-    let commentInput =
-        document.getElementById(`comment-${id}`);
+    let input =
+        document.getElementById(
+            `commentInput-${postId}`
+        );
 
-    let commentText =
-        commentInput.value.trim();
+    let text =
+        input.value.trim();
 
-    if (commentText === "") {
+    if (!text) {
+
+        alert("Comment empty");
 
         return;
     }
 
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
+    let currentUser =
+        JSON.parse(
 
-    posts = posts.map(function(post) {
-
-        if (post.id === id) {
-
-            post.comments =
-                post.comments || [];
-
-            post.comments.push(commentText);
-        }
-
-        return post;
-    });
-
-    localStorage.setItem(
-        "posts",
-        JSON.stringify(posts)
-    );
-
-    displayPosts();
-}
-
-// ================= SAVE POST =================
-
-function savePost(id) {
-
-    let savedPosts =
-        JSON.parse(localStorage.getItem("savedPosts")) || [];
-
-    if (!savedPosts.includes(id)) {
-
-        savedPosts.push(id);
-
-        localStorage.setItem(
-            "savedPosts",
-            JSON.stringify(savedPosts)
+            localStorage.getItem(
+                "currentUser"
+            ) || "{}"
         );
 
-        alert("Post saved!");
+    try {
+
+        await fetch(
+
+            `http://localhost:5000/posts/comment/${postId}`,
+
+            {
+
+                method: "PUT",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    username:
+                        currentUser.name,
+
+                    text
+                })
+            }
+        );
+
+        input.value = "";
+
+        loadPosts();
+
+    } catch(error) {
+
+        console.log(error);
+
+        alert("Failed to comment");
     }
 }
+
+// ================= SHARE POST =================
+
+function sharePost() {
+
+    navigator.clipboard.writeText(
+
+        window.location.href
+    );
+
+    alert("Post link copied 🚀");
+}
+
+// ================= FOLLOW USER =================
+
+// ================= FOLLOW USER =================
+
+async function followUser(username) {
+
+    // SAFE USER FETCH
+
+    let savedUser =
+        localStorage.getItem(
+            "currentUser"
+        );
+
+    if (
+        !savedUser ||
+        savedUser === "undefined"
+    ) {
+
+        alert(
+            "Please login again"
+        );
+
+        return;
+    }
+
+    let currentUser =
+        JSON.parse(savedUser);
+
+    try {
+
+        let response =
+            await fetch(
+
+                "http://localhost:5000/users/follow",
+
+                {
+
+                    method: "PUT",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        currentUserEmail:
+                            currentUser.email,
+
+                        targetUserName:
+                            username
+                    })
+                }
+            );
+
+        let data =
+            await response.json();
+
+        alert(data.message);
+
+        // SAVE UPDATED USER
+
+        if (data.currentUser) {
+
+            localStorage.setItem(
+
+                "currentUser",
+
+                JSON.stringify(
+                    data.currentUser
+                )
+            );
+        }
+
+    } catch(error) {
+
+        console.log(error);
+
+        alert("Follow failed");
+    }
+}
+
+// ================= LOAD SAVED POSTS =================
+
 function loadSavedPosts() {
 
     let container =
-        document.getElementById("savedPostsContainer");
+        document.getElementById(
+            "savedPostsContainer"
+        );
 
     if (!container) return;
 
-    let savedPosts =
-        JSON.parse(localStorage.getItem("savedPosts")) || [];
+    container.innerHTML = `
 
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
+        <p>
 
-    container.innerHTML = "";
+            Saved posts feature coming soon ⭐
 
-    let filteredPosts =
-        posts.filter(function(post) {
-
-            return savedPosts.includes(post.id);
-        });
-
-    if (filteredPosts.length === 0) {
-
-        container.innerHTML =
-            "<p>No saved posts yet ⭐</p>";
-
-        return;
-    }
-
-    filteredPosts.forEach(function(post) {
-
-        container.innerHTML += `
-
-            <div class="post">
-
-                <div class="post-header">
-
-                    <img
-                        src="${post.avatar}"
-                        class="avatar"
-                    >
-
-                    <h3>${post.username}</h3>
-
-                </div>
-
-                <p>${post.text}</p>
-
-                <small>${post.time}</small>
-
-            </div>
-        `;
-    });
+        </p>
+    `;
 }
-loadSavedPosts();
+
+// ================= LOAD SUGGESTED USERS =================
+
 function loadSuggestedUsers() {
 
     let container =
-        document.getElementById("suggestedUsers");
+        document.getElementById(
+            "suggestedUsers"
+        );
 
     if (!container) return;
 
     let users =
-        JSON.parse(localStorage.getItem("users")) || [];
+        JSON.parse(
+
+            localStorage.getItem(
+                "users"
+            ) || "[]"
+        );
 
     let currentUser =
-        JSON.parse(localStorage.getItem("currentUser"));
+        JSON.parse(
+
+            localStorage.getItem(
+                "currentUser"
+            ) || "{}"
+        );
 
     container.innerHTML = "";
 
     users.forEach(function(user) {
 
-        if (user.email !== currentUser.email) {
+        if (
+            user.email !== currentUser.email
+        ) {
 
             container.innerHTML += `
 
@@ -431,44 +507,67 @@ function loadSuggestedUsers() {
         }
     });
 }
-function loadExplorePosts() {
+
+// ================= LOAD EXPLORE POSTS =================
+
+async function loadExplorePosts() {
 
     let container =
-        document.getElementById("explorePosts");
+        document.getElementById(
+            "explorePosts"
+        );
 
     if (!container) return;
 
-    let posts =
-        JSON.parse(localStorage.getItem("posts")) || [];
+    try {
 
-    container.innerHTML = "";
+        let response =
+            await fetch(
+                "http://localhost:5000/posts"
+            );
 
-    posts.forEach(function(post) {
+        let posts =
+            await response.json();
 
-        container.innerHTML += `
+        container.innerHTML = "";
 
-            <div class="post">
+        posts.forEach(function(post) {
 
-                <div class="post-header">
+            container.innerHTML += `
 
-                    <img
-                        src="${post.avatar}"
-                        class="avatar"
-                    >
+                <div class="post">
 
-                    <h3>${post.username}</h3>
+                    <div class="post-header">
+
+                        <img
+                            src="https://ui-avatars.com/api/?name=${post.username}"
+                            class="avatar"
+                        >
+
+                        <h3>${post.username}</h3>
+
+                    </div>
+
+                    <p>${post.content}</p>
+
+                    <small>${post.time}</small>
 
                 </div>
+            `;
+        });
 
-                <p>${post.text}</p>
+    } catch(error) {
 
-                <small>${post.time}</small>
-
-            </div>
-        `;
-    });
+        console.log(error);
+    }
 }
+
+// ================= INITIAL LOAD =================
+
+loadPosts();
+
 loadExplorePosts();
 
-
 loadSuggestedUsers();
+
+loadSavedPosts();

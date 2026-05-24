@@ -16,12 +16,22 @@ const postSchema = new mongoose.Schema({
         required: true
     },
 
-    likes: {
+    likes: [
 
-        type: Number,
+    {
 
-        default: 0
-    },
+        type: String
+    }
+],
+comments: [
+
+    {
+
+        username: String,
+
+        text: String
+    }
+],
 
     time: {
 

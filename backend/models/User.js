@@ -23,7 +23,22 @@ const userSchema = new mongoose.Schema({
         type: String,
 
         required: true
+    },
+    followers: [
+
+    {
+
+        type: String
     }
+],
+
+following: [
+
+    {
+
+        type: String
+    }
+]
 });
 
 module.exports =

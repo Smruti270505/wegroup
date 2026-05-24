@@ -70,10 +70,124 @@ async function getPosts(req, res) {
         });
     }
 }
+async function likePost(req, res) {
+
+    try {
+
+        let postId =
+            req.params.id;
+
+        let {
+
+            username
+
+        } = req.body;
+
+        let post =
+            await Post.findById(postId);
+
+        if (!post) {
+
+            return res.status(404).json({
+
+                message: "Post not found"
+            });
+        }
+
+        // CHECK ALREADY LIKED
+
+        if (
+            post.likes.includes(username)
+        ) {
+
+            post.likes =
+                post.likes.filter(
+
+                    user => user !== username
+                );
+
+        } else {
+
+            post.likes.push(username);
+        }
+
+        await post.save();
+
+        res.status(200).json({
+
+            message: "Post updated",
+
+            likes: post.likes.length
+        });
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message: "Server error"
+        });
+    }
+}
+async function addComment(req, res) {
+
+    try {
+
+        let postId =
+            req.params.id;
+
+        let {
+
+            username,
+
+            text
+
+        } = req.body;
+
+        let post =
+            await Post.findById(postId);
+
+        if (!post) {
+
+            return res.status(404).json({
+
+                message: "Post not found"
+            });
+        }
+
+        post.comments.push({
+
+            username,
+
+            text
+        });
+
+        await post.save();
+
+        res.status(200).json({
+
+            message: "Comment added"
+        });
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message: "Server error"
+        });
+    }
+}
 
 module.exports = {
 
     createPost,
 
-    getPosts
+    getPosts,
+
+    likePost,
+
+    addComment
 };
