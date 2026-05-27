@@ -221,6 +221,8 @@ async function likePost(postId) {
                 "currentUser"
             ) || "{}"
         );
+    let token =
+    localStorage.getItem("token");
 
     try {
 
@@ -234,9 +236,12 @@ async function likePost(postId) {
 
                 headers: {
 
-                    "Content-Type":
-                        "application/json"
-                },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        `Bearer ${token}`
+},
 
                 body: JSON.stringify({
 
@@ -301,6 +306,8 @@ async function addComment(postId) {
                 "currentUser"
             ) || "{}"
         );
+        let token =
+    localStorage.getItem("token");
 
     try {
 
@@ -314,9 +321,12 @@ async function addComment(postId) {
 
                 headers: {
 
-                    "Content-Type":
-                        "application/json"
-                },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        `Bearer ${token}`
+},
 
                 body: JSON.stringify({
 
@@ -379,6 +389,8 @@ async function followUser(username) {
 
     let currentUser =
         JSON.parse(savedUser);
+        let token =
+    localStorage.getItem("token");
 
     try {
 
@@ -393,9 +405,12 @@ async function followUser(username) {
 
                     headers: {
 
-                        "Content-Type":
-                            "application/json"
-                    },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        `Bearer ${token}`
+},
 
                     body: JSON.stringify({
 

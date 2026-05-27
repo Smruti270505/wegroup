@@ -1,5 +1,6 @@
 const express = require("express");
-
+const authMiddleware =
+    require("../middleware/authMiddleware");
 const router = express.Router();
 
 const {
@@ -24,6 +25,8 @@ router.post("/login", login);
 router.put(
 
     "/follow",
+
+    authMiddleware,
 
     followUser
 );

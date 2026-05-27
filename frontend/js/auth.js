@@ -47,7 +47,32 @@ if (loginForm) {
                 let data =
                     await response.json();
 
-                alert(data.message);
+                // SAVE TOKEN
+
+localStorage.setItem(
+
+    "token",
+
+    data.token
+);
+
+// SAVE USER
+
+localStorage.setItem(
+
+    "currentUser",
+
+    JSON.stringify(data.user)
+);
+
+// SUCCESS
+
+alert(data.message);
+
+// REDIRECT
+
+window.location.href =
+    "dashboard.html";
 
                 if (response.ok) {
 
