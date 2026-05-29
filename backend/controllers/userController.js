@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
-
+const Notification =
+    require("../models/Notification");
 const jwt = require("jsonwebtoken");
 // TEMPORARY USERS ARRAY
 const User = require("../models/User");
@@ -191,6 +192,22 @@ async function followUser(req, res) {
 
                 email: currentUserEmail
             });
+            let notification =
+    new Notification({
+
+        receiver:
+            targetUser.name,
+
+        sender:
+            currentUser.name,
+
+        type: "follow",
+
+        message:
+            `${currentUser.name} started following you`
+    });
+
+await notification.save();
 
         // FIND TARGET USER
 
@@ -335,6 +352,75 @@ async function getUser(req, res) {
         });
     }
 }
+async function searchUsers(req, res) {
+
+    try {
+
+        let query =
+            req.query.query;
+
+        let users =
+            await User.find({
+
+                name: {
+
+                    $regex: query,
+
+                    $options: "i"
+                }
+            });
+
+        res.status(200).json(users);
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message: "Server error"
+        });
+    }
+}
+async function getNotifications(
+
+    req,
+
+    res
+) {
+
+    try {
+
+        let username =
+            req.params.username;
+
+        let notifications =
+            await Notification.find({
+
+                receiver: username
+            })
+
+            .sort({
+
+                createdAt: -1
+            });
+
+        res.status(200).json(
+
+            notifications
+        );
+
+    } catch(error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            message:
+                "Server error"
+        });
+    }
+}
 module.exports = {
 
     signup,
@@ -343,5 +429,9 @@ module.exports = {
 
     followUser,
 
-    getUser
+    getUser,
+
+    searchUsers,
+
+    getNotifications
 };

@@ -11,7 +11,10 @@ const {
 
     followUser,
 
-    getUser
+    getUser,
+
+    searchUsers,
+    getNotifications
 
 } = require("../controllers/userController");
 
@@ -32,9 +35,21 @@ router.put(
 );
 router.get(
 
+    "/search/users",
+
+    searchUsers
+);
+router.get(
+
     "/:email",
 
     getUser
+);
+router.get(
+
+    "/notifications/:username",
+
+    getNotifications
 );
 
 module.exports = router;

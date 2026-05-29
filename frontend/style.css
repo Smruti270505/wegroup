@@ -666,3 +666,30 @@ textarea {
 
     margin-top: 8px;
 }
+/* SEARCH USERS */
+
+.search-box {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.search-user {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    background: white;
+
+    padding: 15px;
+
+    margin-top: 10px;
+
+    border-radius: 10px;
+}

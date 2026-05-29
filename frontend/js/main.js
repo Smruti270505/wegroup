@@ -116,7 +116,62 @@ if (savedTheme === "dark") {
 
     document.body.classList.add("dark-mode");
 }
+async function loadNotifications() {
 
+    let currentUser =
+        JSON.parse(
+
+            localStorage.getItem(
+                "currentUser"
+            ) || "{}"
+        );
+
+    let container =
+        document.getElementById(
+            "notificationsContainer"
+        );
+
+    if (!container) return;
+
+    try {
+
+        let response =
+            await fetch(
+
+                `http://localhost:5000/users/notifications/${currentUser.name}`
+            );
+
+        let notifications =
+            await response.json();
+
+        container.innerHTML = "";
+
+        notifications.forEach(
+
+            function(notification) {
+
+                container.innerHTML += `
+
+                    <div class="notification">
+
+                        <p>
+
+                            ${notification.message}
+
+                        </p>
+
+                    </div>
+                `;
+            }
+        );
+
+    } catch(error) {
+
+        console.log(error);
+    }
+}
+
+loadNotifications();
 
 
 

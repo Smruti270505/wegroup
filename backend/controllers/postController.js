@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
-
+const Notification =
+    require("../models/Notification");
 // CREATE POST
 
 async function createPost(req, res) {
@@ -119,6 +120,22 @@ async function likePost(req, res) {
 
             likes: post.likes.length
         });
+        let notification =
+    new Notification({
+
+        receiver:
+            post.username,
+
+        sender:
+            req.user.id,
+
+        type: "like",
+
+        message:
+            `${currentUser.name} liked your post`
+    });
+
+await notification.save();
 
     } catch(error) {
 
@@ -162,6 +179,22 @@ async function addComment(req, res) {
 
             text
         });
+        let notification =
+    new Notification({
+
+        receiver:
+            post.username,
+
+        sender:
+            req.user.id,
+
+        type: "comment",
+
+        message:
+            `${username} commented on your post`
+    });
+
+await notification.save();
 
         await post.save();
 

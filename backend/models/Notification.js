@@ -1,0 +1,49 @@
+const mongoose =
+    require("mongoose");
+
+const notificationSchema =
+    new mongoose.Schema({
+
+        receiver: {
+
+            type: String,
+
+            required: true
+        },
+
+        sender: {
+
+            type: String,
+
+            required: true
+        },
+
+        type: {
+
+            type: String,
+
+            required: true
+        },
+
+        message: {
+
+            type: String,
+
+            required: true
+        },
+
+        createdAt: {
+
+            type: Date,
+
+            default: Date.now
+        }
+    });
+
+module.exports =
+    mongoose.model(
+
+        "Notification",
+
+        notificationSchema
+    );

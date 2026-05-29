@@ -576,6 +576,90 @@ async function loadExplorePosts() {
         console.log(error);
     }
 }
+// ================= SEARCH USERS =================
+
+async function searchUsers() {
+
+    let query =
+        document.getElementById(
+            "searchInput"
+        ).value;
+
+    let container =
+        document.getElementById(
+            "searchResults"
+        );
+
+    if (!query) {
+
+        container.innerHTML = "";
+
+        return;
+    }
+
+    try {
+
+        let response =
+            await fetch(
+
+                `http://localhost:5000/users/search/users?query=${query}`
+            );
+
+        let users =
+            await response.json();
+
+        container.innerHTML = "";
+
+        users.forEach(function(user) {
+
+            container.innerHTML += `
+
+                <div class="search-user">
+
+                    <img
+                        src="https://ui-avatars.com/api/?name=${user.name}"
+                        class="avatar"
+                    >
+
+                    <div>
+
+                        <h3>${user.name}</h3>
+
+                        <p>${user.email}</p>
+
+                    </div>
+
+                    <button
+                        onclick="visitProfile('${user.email}')"
+                    >
+
+                        Visit
+
+                    </button>
+
+                </div>
+            `;
+        });
+
+    } catch(error) {
+
+        console.log(error);
+    }
+}
+// ================= VISIT PROFILE =================
+
+function visitProfile(email) {
+
+    localStorage.setItem(
+
+        "visitProfileEmail",
+
+        email
+    );
+
+    window.location.href =
+        "visitProfile.html";
+}
 
 // ================= INITIAL LOAD =================
 
