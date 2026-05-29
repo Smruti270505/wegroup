@@ -79,9 +79,7 @@ async function likePost(req, res) {
             req.params.id;
 
         let {
-
             username
-
         } = req.body;
 
         let post =
@@ -95,7 +93,7 @@ async function likePost(req, res) {
             });
         }
 
-        // CHECK ALREADY LIKED
+        // TOGGLE LIKE
 
         if (
             post.likes.includes(username)
@@ -110,6 +108,25 @@ async function likePost(req, res) {
         } else {
 
             post.likes.push(username);
+
+            // CREATE NOTIFICATION
+
+            let notification =
+                new Notification({
+
+                    receiver:
+                        post.username,
+
+                    sender:
+                        username,
+
+                    type: "like",
+
+                    message:
+                        `${username} liked your post`
+                });
+
+            await notification.save();
         }
 
         await post.save();
@@ -120,22 +137,6 @@ async function likePost(req, res) {
 
             likes: post.likes.length
         });
-        let notification =
-    new Notification({
-
-        receiver:
-            post.username,
-
-        sender:
-            req.user.id,
-
-        type: "like",
-
-        message:
-            `${currentUser.name} liked your post`
-    });
-
-await notification.save();
 
     } catch(error) {
 
