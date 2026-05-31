@@ -9,11 +9,18 @@ async function createPost(req, res) {
 
         let {
 
-            username,
+    username,
 
-            content
+    content
 
-        } = req.body;
+} = req.body;
+
+let image = "";
+
+if (req.file) {
+
+    image = req.file.path;
+}
 
         if (!content) {
 
@@ -25,10 +32,12 @@ async function createPost(req, res) {
 
         let newPost = new Post({
 
-            username,
+    username,
 
-            content
-        });
+    content,
+
+    image
+});
 
         await newPost.save();
 

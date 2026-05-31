@@ -39,7 +39,13 @@ comments: [
 
         default:
             new Date().toLocaleString()
-    }
+    },
+    image: {
+
+    type: String,
+
+    default: ""
+}
 });
 
 module.exports =

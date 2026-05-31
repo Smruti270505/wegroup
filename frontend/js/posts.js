@@ -28,6 +28,32 @@ async function createPost() {
 
     try {
 
+        let image =
+            document.getElementById(
+                "postImage"
+            ).files[0];
+
+        let formData =
+            new FormData();
+
+        formData.append(
+            "username",
+            currentUser.name
+        );
+
+        formData.append(
+            "content",
+            content
+        );
+
+        if (image) {
+
+            formData.append(
+                "image",
+                image
+            );
+        }
+
         let response =
             await fetch(
 
@@ -39,20 +65,11 @@ async function createPost() {
 
                     headers: {
 
-                        "Content-Type":
-                            "application/json",
+    Authorization:
+        `Bearer ${token}`
+},
 
-                        "Authorization":
-                            `Bearer ${token}`
-                    },
-
-                    body: JSON.stringify({
-
-                        username:
-                            currentUser.name,
-
-                        content
-                    })
+                    body: formData
                 }
             );
 
@@ -122,7 +139,14 @@ async function loadPosts() {
                     </div>
 
                     <p class="post-content">
+                    ${post.image ? `
 
+    <img
+        src="${post.image}"
+        class="post-image"
+    >
+
+` : ""}
                         ${post.content}
 
                     </p>

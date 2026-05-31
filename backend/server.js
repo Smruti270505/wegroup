@@ -52,9 +52,76 @@ app.get("/", function(req, res) {
 
 // START SERVER
 
-app.listen(PORT, function() {
+const http =
+    require("http");
+
+const {
+
+    Server
+
+} = require("socket.io");
+
+const server =
+    http.createServer(app);
+
+const io =
+    new Server(server, {
+
+        cors: {
+
+            origin: "*"
+        }
+    });
+
+// SOCKET CONNECTION
+
+io.on("connection", (socket) => {
 
     console.log(
+
+        "User connected:",
+        socket.id
+    );
+
+    // RECEIVE MESSAGE
+
+    socket.on(
+
+        "sendMessage",
+
+        (data) => {
+
+            io.emit(
+
+                "receiveMessage",
+
+                data
+            );
+        }
+    );
+
+    // DISCONNECT
+
+    socket.on(
+
+        "disconnect",
+
+        () => {
+
+            console.log(
+
+                "User disconnected"
+            );
+        }
+    );
+});
+
+// START SERVER
+
+server.listen(PORT, () => {
+
+    console.log(
+
         `Server running on port ${PORT}`
     );
 });
