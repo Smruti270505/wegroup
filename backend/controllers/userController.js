@@ -192,22 +192,6 @@ async function followUser(req, res) {
 
                 email: currentUserEmail
             });
-            let notification =
-    new Notification({
-
-        receiver:
-            targetUser.name,
-
-        sender:
-            currentUser.name,
-
-        type: "follow",
-
-        message:
-            `${currentUser.name} started following you`
-    });
-
-await notification.save();
 
         // FIND TARGET USER
 
@@ -238,77 +222,96 @@ await notification.save();
             });
         }
 
-        // SAFETY CHECKS
+        // UNFOLLOW
 
-if (!currentUser.following) {
+        if (
 
-    currentUser.following = [];
-}
+            currentUser.following.includes(
 
-if (!targetUser.followers) {
+                targetUserName
+            )
 
-    targetUser.followers = [];
-}
+        ) {
 
-// TOGGLE FOLLOW
+            currentUser.following =
 
-if (
+                currentUser.following.filter(
 
-    currentUser.following.includes(
-        targetUserName
-    )
+                    user =>
+                        user !== targetUserName
+                );
 
-) {
+            targetUser.followers =
 
-    // UNFOLLOW
+                targetUser.followers.filter(
 
-    currentUser.following =
-        currentUser.following.filter(
+                    user =>
+                        user !== currentUser.name
+                );
 
-            user =>
-                user !== targetUserName
-        );
+        } else {
 
-    targetUser.followers =
-        targetUser.followers.filter(
+            // FOLLOW
 
-            user =>
-                user !== currentUser.name
-        );
+            currentUser.following.push(
 
-} else {
+                targetUserName
+            );
 
-    // FOLLOW
+            targetUser.followers.push(
 
-    currentUser.following.push(
-        targetUserName
-    );
+                currentUser.name
+            );
 
-    targetUser.followers.push(
-        currentUser.name
-    );
-}
+            // CREATE NOTIFICATION
+
+            let notification =
+                new Notification({
+
+                    receiver:
+                        targetUser.name,
+
+                    sender:
+                        currentUser.name,
+
+                    type: "follow",
+
+                    message:
+                        `${currentUser.name} started following you`
+                });
+
+            await notification.save();
+        }
+
+        // SAVE USERS
 
         await currentUser.save();
 
         await targetUser.save();
 
+        // RESPONSE
+
         res.status(200).json({
 
-    message:
-        "Follow system updated",
+            message:
+                "Follow system updated",
 
-    currentUser: {
+            currentUser: {
 
-        name: currentUser.name,
+                name:
+                    currentUser.name,
 
-        email: currentUser.email,
+                email:
+                    currentUser.email,
 
-        followers: currentUser.followers,
+                followers:
+                    currentUser.followers,
 
-        following: currentUser.following
-    }
-});
+                following:
+                    currentUser.following
+            }
+        });
+
     } catch(error) {
 
         console.log(error);
