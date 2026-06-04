@@ -972,3 +972,22 @@ textarea {
         padding: 15px;
     }
 }
+#onlineUsers {
+
+    margin-bottom: 20px;
+
+    background: white;
+
+    padding: 10px;
+
+    border-radius: 10px;
+}
+
+#typingIndicator {
+
+    color: green;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}

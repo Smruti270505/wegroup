@@ -75,15 +75,49 @@ const io =
 
 // SOCKET CONNECTION
 
+let onlineUsers = [];
+
 io.on("connection", (socket) => {
 
     console.log(
-
         "User connected:",
         socket.id
     );
 
-    // RECEIVE MESSAGE
+    // USER ONLINE
+
+    socket.on(
+
+        "userOnline",
+
+        (username) => {
+
+            socket.username =
+                username;
+
+            if (
+
+                !onlineUsers.includes(
+                    username
+                )
+
+            ) {
+
+                onlineUsers.push(
+                    username
+                );
+            }
+
+            io.emit(
+
+                "onlineUsers",
+
+                onlineUsers
+            );
+        }
+    );
+
+    // SEND MESSAGE
 
     socket.on(
 
@@ -100,6 +134,23 @@ io.on("connection", (socket) => {
         }
     );
 
+    // TYPING
+
+    socket.on(
+
+        "typing",
+
+        (username) => {
+
+            socket.broadcast.emit(
+
+                "userTyping",
+
+                username
+            );
+        }
+    );
+
     // DISCONNECT
 
     socket.on(
@@ -111,6 +162,23 @@ io.on("connection", (socket) => {
             console.log(
 
                 "User disconnected"
+            );
+
+            onlineUsers =
+
+                onlineUsers.filter(
+
+                    user =>
+
+                        user !==
+                        socket.username
+                );
+
+            io.emit(
+
+                "onlineUsers",
+
+                onlineUsers
             );
         }
     );
