@@ -1,9 +1,7 @@
 require("dotenv").config();
 
-const mongoose = require("mongoose");
-
 const express = require("express");
-
+const mongoose = require("mongoose");
 const cors = require("cors");
 
 const userRoutes =
@@ -12,6 +10,8 @@ const userRoutes =
 const postRoutes =
     require("./routes/postRoutes");
 
+const messageRoutes =
+    require("./routes/messageRoutes");
 const app = express();
 
 const PORT = 5000;
@@ -42,6 +42,10 @@ app.use(express.json());
 app.use("/users", userRoutes);
 
 app.use("/posts", postRoutes);
+app.use(
+    "/messages",
+    messageRoutes
+);
 
 // HOME ROUTE
 
