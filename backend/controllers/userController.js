@@ -424,6 +424,16 @@ async function getNotifications(
         });
     }
 }
+async function updateProfilePicture(req, res) {
+    try {
+        // Placeholder implementation: profile picture upload handling goes here.
+        // For now, respond with Not Implemented.
+        return res.status(501).json({ message: "Not implemented" });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+}
 module.exports = {
 
     signup,
