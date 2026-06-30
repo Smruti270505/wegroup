@@ -12,6 +12,7 @@ const {
     followUser,
 
     getUser,
+    getAllUsers,
 
     searchUsers,
     getNotifications
@@ -39,17 +40,16 @@ router.get(
 
     searchUsers
 );
-router.get(
+router.get("/all", getAllUsers);
 
-    "/:email",
-
-    getUser
-);
+router.get("/:id", getUser);
 router.get(
 
     "/notifications/:username",
 
     getNotifications
 );
+
+
 
 module.exports = router;

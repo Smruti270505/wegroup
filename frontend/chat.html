@@ -1,59 +1,65 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
-    <a href="dashboard.html">
 
-    ← Back to Dashboard
+    <meta charset="UTF-8">
 
-</a>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>WeGroup Chat</title>
 
-    <link
-    rel="stylesheet"
-    href="./css/style.css"
->
+    <link rel="stylesheet" href="./style.css">
 
 </head>
 
 <body>
 
-    <div class="chat-container">
+    <a href="dashboard.html">← Back to Dashboard</a>
 
-        <h1>Realtime Chat 💬</h1>
-        <h3>
+    <div class="chat-page">
 
-    Online Users
+        <!-- LEFT SIDEBAR -->
 
-</h3>
+        <div class="chat-sidebar">
 
-<div
-    id="onlineUsers"
-></div>
+            <h2>Users</h2>
 
-<hr>
+            <div id="userList"></div>
 
-<p
-    id="typingIndicator"
-></p>
+        </div>
 
-        <div id="messages"></div>
+        <!-- RIGHT CHAT -->
 
-        <div class="chat-input">
+        <div class="chat-main">
 
-            <input
-                type="text"
-                id="messageInput"
-                placeholder="Type message..."
-            >
+            <h1>Realtime Chat 💬</h1>
 
-            <button onclick="sendMessage()">
+            <h3>Online Users</h3>
 
-                Send
+            <div id="onlineUsers"></div>
 
-            </button>
+            <hr>
+
+            <p id="typingIndicator"></p>
+
+            <div id="messages"></div>
+
+            <div class="chat-input">
+
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="Type message..."
+                >
+
+                <button onclick="sendMessage()">
+
+                    Send
+
+                </button>
+
+            </div>
 
         </div>
 

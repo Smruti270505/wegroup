@@ -1,16 +1,30 @@
 const socket =
     io("http://localhost:5000");
-    let currentUser =
 
-    JSON.parse(
-
-        localStorage.getItem(
-
-            "currentUser"
-
-        ) || "{}"
+let currentUserData =
+    localStorage.getItem(
+        "currentUser"
     );
 
+if (
+
+    !currentUserData ||
+
+    currentUserData === "undefined"
+
+) {
+
+    alert("Please login first");
+
+    window.location.href =
+        "login.html";
+
+}
+
+let currentUser =
+    JSON.parse(
+        currentUserData
+    );
 // REGISTER USER
 
 socket.emit(
@@ -195,3 +209,93 @@ socket.on(
         );
     }
 );
+let selectedUser = null;
+
+async function loadUsers() {
+
+    try {
+
+        let response =
+
+            await fetch(
+                "http://localhost:5000/users/all"
+            );
+
+        let users =
+            await response.json();
+
+        let container =
+            document.getElementById(
+                "userList"
+            );
+
+        container.innerHTML = "";
+
+        users.forEach(user => {
+
+            if (
+
+                user.name === currentUser.name
+
+            ) return;
+
+            container.innerHTML += `
+
+                <div
+                    class="user-card"
+                    onclick="selectUser('${user.name}')"
+                >
+
+                    👤 ${user.name}
+
+                </div>
+
+            `;
+
+        });
+
+    }
+
+    catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
+function selectUser(name){
+
+    selectedUser = name;
+
+    document.querySelectorAll(
+
+        ".user-card"
+
+    ).forEach(card=>{
+
+        card.classList.remove(
+
+            "active-user"
+
+        );
+
+        if(
+
+            card.innerText.includes(name)
+
+        ){
+
+            card.classList.add(
+
+                "active-user"
+
+            );
+
+        }
+
+    });
+
+}
+
+loadUsers();
